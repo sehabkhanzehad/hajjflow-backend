@@ -13,7 +13,7 @@ class SignInRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -29,12 +29,12 @@ class SignInRequest extends FormRequest
         ];
     }
 
-    private function authenticate(): bool
+    public function authenticate(): bool
     {
         return Auth::attempt($this->only('email', 'password'));
     }
 
-    private function authenticatedUser(): User
+    public function authenticatedUser(): User
     {
         return Auth::user();
     }
