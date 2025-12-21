@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Traits;
+
+use Illuminate\Validation\ValidationException;
+
+trait ApiResponse
+{
+    /**
+     * Return a standardized JSON success response.
+     *
+     * @param string $message    The success message.
+     * @param int    $statusCode HTTP status code.
+     * @param array  $data       The data to include in the response.
+     * @param array  $meta       Additional metadata for the response.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function success(string $message = 'Success.', int $statusCode = 200, array $data = [],  array $meta = [])
+    {
+        $response = [
+            'success' => true,
+            'status'  => $statusCode,
+            'message' => $message,
+            'data'    => $data,
+        ];
+
+        if (!empty($meta)) $response['meta'] = $meta;
+
+        return response()->json($response, $statusCode);
+    }
+
+    /**
+     * Return a standardized JSON error response.
+     *
+     * @param string $message    The error message.
+     * @param int    $statusCode HTTP status code.
+     * @param array  $errors     Additional error details.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public static function error(string $message = 'Error.', int $statusCode = 400, array $errors = [])
+    {
+        $response = [
+            'success' => false,
+            'status'  => $statusCode,
+            'message' => $message,
+        ];
+
+        if (!empty($errors)) $response['errors'] = $errors;
+
+        return response()->json($response, $statusCode);
+    }
+
+    /**
+     * Create a ValidationException with a custom message.
+     *
+     * @param string $key     The field key associated with the error.
+     * @param string $message The error message.
+     * @return ValidationException
+     */
+    protected function validationException(string $key, string $message): ValidationException
+    {
+        return ValidationException::withMessages([$key => $message]);
+    }
+}
