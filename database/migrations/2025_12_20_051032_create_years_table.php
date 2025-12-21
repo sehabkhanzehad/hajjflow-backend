@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('years', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // e.g., "Hajj 2026"
+            $table->string('name');
             $table->date('start_date');
             $table->date('end_date');
             $table->boolean('status')->default(false);

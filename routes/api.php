@@ -1,16 +1,15 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Resources\Api\CurrentUserResource;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\YearController;
 use Illuminate\Support\Facades\Route;
 
+require __DIR__ . '/api/auth.php';
 
-Route::prefix('auth')->group(function () {
-    Route::post('/sign-in', [AuthController::class, 'signIn']);
 
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/user', [AuthController::class, 'user']);
-        Route::post('/sign-out', [AuthController::class, 'signOut']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('years')->group(function () {
+        Route::get('/', [YearController::class, 'index']);
+        Route::post('/', [YearController::class, 'store']);
+        Route::put('/{year}', [YearController::class, 'update']);
     });
 });
