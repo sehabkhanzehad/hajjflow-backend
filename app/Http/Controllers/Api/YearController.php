@@ -19,12 +19,12 @@ class YearController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:50'],
+            'name' => ['required', 'string', 'max:50', 'unique:years,name'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
         ]);
 
-        Year::create($validated);
+        $year = Year::create($validated);
 
         return $this->success("Year created successfully.", 201);
     }
@@ -32,7 +32,7 @@ class YearController extends Controller
     public function update(Request $request, Year $year): JsonResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:50'],
+            'name' => ['required', 'string', 'max:50', 'unique:years,name,' . $year->id],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'status' => ['required', 'boolean'],
