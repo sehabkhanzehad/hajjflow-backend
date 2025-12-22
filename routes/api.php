@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\BankSectionController;
+use App\Http\Controllers\Api\BillSectionController;
+use App\Http\Controllers\Api\EmployeeSectionController;
 use App\Http\Controllers\Api\GroupLeaderSectionController;
 use App\Http\Controllers\Api\SectionController;
 use App\Http\Controllers\Api\UserController;
@@ -21,6 +23,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('group-leaders')->group(function () {
             Route::get('/', [GroupLeaderSectionController::class, 'index']);
             Route::post('/', [GroupLeaderSectionController::class, 'store']);
+            Route::put('/{section}', [GroupLeaderSectionController::class, 'update']);
+        });
+
+        Route::prefix('employees')->group(function () {
+            Route::get('/', [EmployeeSectionController::class, 'index']);
+            Route::post('/', [EmployeeSectionController::class, 'store']);
+            Route::put('/{section}', [EmployeeSectionController::class, 'update']);
+        });
+
+        Route::prefix('bills')->group(function () {
+            Route::get('/', [BillSectionController::class, 'index']);
+            Route::post('/', [BillSectionController::class, 'store']);
+            Route::put('/{section}', [BillSectionController::class, 'update']);
         });
 
         Route::put('/{section}', [SectionController::class, 'update']);

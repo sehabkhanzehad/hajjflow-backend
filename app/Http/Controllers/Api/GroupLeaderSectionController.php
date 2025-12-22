@@ -9,6 +9,7 @@ use App\Models\GroupLeader;
 use App\Models\Pilgrim;
 use App\Models\Section;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -58,5 +59,43 @@ class GroupLeaderSectionController extends Controller
         ]);
 
         return $this->success("Section created successfully.", 201);
+    }
+
+    public function update(Request $request, Section $section): JsonResponse
+    {
+        $request->validate([
+            "code" => ["required", "string", Rule::unique("sections", "code")->ignore($section)],
+            "description" => ["nullable", "string"],
+
+            "group_name" => ["nullable", "string", "max:255"],
+
+            "first_name" => ["required", "string", "max:255"],
+            "last_name" => ["nullable", "string", "max:255"],
+            "mother_name" => ["nullable", "string", "max:255"],
+            "father_name" => ["nullable", "string", "max:255"],
+            "phone" => ["required", "string", "max:20"],
+            "gender" => ["required", "in:male,female,other"],
+        ]);
+
+        $section->update([
+            "code" => $request->code,
+            "name" => $request->first_name . ' ' . ($request->last_name ?? ''),
+            "description" => $request->description,
+        ]);
+
+        $section->groupLeader->pilgrim->update([
+            "first_name" => $request->first_name,
+            "last_name" => $request->last_name,
+            "mother_name" => $request->mother_name,
+            "father_name" => $request->father_name,
+            "phone" => $request->phone,
+            "gender" => $request->gender,
+        ]);
+
+        $section->groupLeader->update([
+            "group_name" => $request->group_name,
+        ]);
+
+        return $this->success("Group leader section updated successfully.");
     }
 }

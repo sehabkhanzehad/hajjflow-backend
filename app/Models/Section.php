@@ -46,4 +46,14 @@ class Section extends Model
     {
         return $query->whereType(SectionType::GroupLeader);
     }
+
+    public function scopeTypeEmployee($query)
+    {
+        return $query->whereType(SectionType::Employee);
+    }
+
+    public function scopeTypeBill($query)
+    {
+        return $query->whereType(SectionType::Bill);
+    }
 }
