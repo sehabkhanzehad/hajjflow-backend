@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\PackageType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Package extends Model
 {
@@ -20,6 +21,11 @@ class Package extends Model
     public function year(): BelongsTo
     {
         return $this->belongsTo(Year::class);
+    }
+
+    public function registration(): HasMany
+    {
+        return $this->hasMany(Registration::class);
     }
 
     // Scopes

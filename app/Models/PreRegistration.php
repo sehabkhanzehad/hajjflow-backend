@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\PreRegistrationStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PreRegistration extends Model
 {
@@ -28,6 +29,11 @@ class PreRegistration extends Model
     public function pilgrim(): BelongsTo
     {
         return $this->belongsTo(Pilgrim::class);
+    }
+
+    public function registration(): HasOne
+    {
+        return $this->hasOne(Registration::class);
     }
 
     // Scopes

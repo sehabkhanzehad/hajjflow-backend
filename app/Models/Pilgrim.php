@@ -28,6 +28,16 @@ class Pilgrim extends Model
         return $this->hasMany(PreRegistration::class);
     }
 
+    public function registration(): HasOne
+    {
+        return $this->hasOne(Registration::class)->latestOfMany();
+    }
+
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(Registration::class);
+    }
+
 
     // public function groupLeader()
     // {

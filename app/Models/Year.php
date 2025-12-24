@@ -21,6 +21,11 @@ class Year extends Model
         return $this->hasMany(Package::class);
     }
 
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(Registration::class);
+    }
+
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);

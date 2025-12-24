@@ -10,7 +10,9 @@ use App\Http\Controllers\Api\HajjPackageController;
 use App\Http\Controllers\Api\UmrahPackageController;
 use App\Http\Controllers\Api\LendingSectionController;
 use App\Http\Controllers\Api\PreRegistrationController;
+use App\Http\Controllers\Api\RegistrationController;
 use App\Http\Controllers\Api\SectionController;
+use App\Http\Controllers\Api\UmrahController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\YearController;
 use Illuminate\Support\Facades\Route;
@@ -35,12 +37,33 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{preRegistration}', [PreRegistrationController::class, 'destroy']);
     });
 
+    Route::prefix('registrations')->group(function () {
+        Route::get('banks', [RegistrationController::class, 'banks']);
+        Route::get('pre-registrations', [RegistrationController::class, 'preRegistrations']);
+        Route::get('packages', [RegistrationController::class, 'packages']);
+        Route::get('/', [RegistrationController::class, 'index']);
+        Route::post('/', [RegistrationController::class, 'store']);
+        Route::put('/{registration}', [RegistrationController::class, 'update']);
+        Route::delete('/{registration}', [RegistrationController::class, 'destroy']);
+    });
+
     Route::prefix('hajj-packages')->group(function () {
         Route::get('/', [HajjPackageController::class, 'index']);
         Route::post('/', [HajjPackageController::class, 'store']);
         Route::put('/{package}', [HajjPackageController::class, 'update']);
         Route::delete('/{package}', [HajjPackageController::class, 'destroy']);
     });
+
+    Route::prefix('umrahs')->group(function () {
+        Route::get('packages', [UmrahController::class, 'packages']);
+        Route::get('group-leaders', [UmrahController::class, 'groupLeaders']);
+        Route::get('pilgrims', [UmrahController::class, 'pilgrims']);
+        Route::get('/', [UmrahController::class, 'index']);
+        Route::post('/', [UmrahController::class, 'store']);
+        Route::put('/{umrah}', [UmrahController::class, 'update']);
+        Route::delete('/{umrah}', [UmrahController::class, 'destroy']);
+    });
+
     Route::prefix('umrah-packages')->group(function () {
         Route::get('/', [UmrahPackageController::class, 'index']);
         Route::post('/', [UmrahPackageController::class, 'store']);

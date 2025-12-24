@@ -26,4 +26,9 @@ class Bank extends Model
     {
         return $this->hasMany(PreRegistration::class);
     }
+
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(Registration::class);
+    }
 }

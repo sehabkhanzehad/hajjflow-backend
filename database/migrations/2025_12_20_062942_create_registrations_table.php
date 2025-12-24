@@ -19,14 +19,19 @@ return new class extends Migration
             $table->foreignId('package_id')->constrained()->restrictOnDelete();
             $table->foreignId('bank_id')->constrained()->restrictOnDelete();
 
+            $table->date('date');
+            $table->string('passport_number');
+            $table->date('passport_expiry_date');
 
-            $table->string('reg_number')->unique(); // MAIN-2026-XXX
-            $table->enum('status', ['registered', 'visa_processed', 'flown', 'completed', 'transferred_out', 'cancelled'])->default('registered');
-
-            $table->decimal('contract_amount', 15, 2);
-            $table->decimal('paid_amount', 15, 2)->default(0);
+            $table->string('status')->default('active');
 
             $table->timestamps();
+
+            $table->index([
+                "status",
+                "passport_number",
+                "passport_expiry_date",
+            ]);
         });
     }
 
