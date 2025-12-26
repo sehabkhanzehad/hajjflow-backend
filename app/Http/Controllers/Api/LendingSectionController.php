@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\DB;
 
 class LendingSectionController extends Controller
 {
-
     public function index(Request $request): AnonymousResourceCollection
     {
         return LoanResource::collection(Loan::lend()->with('loanable')->paginate($request->get('per_page', 10)));
@@ -52,14 +51,21 @@ class LendingSectionController extends Controller
 
             $loan->increment('amount', $request->amount);
 
-            $loan->transactions()->create([
-                'section_id' => $loan->getSection()->id,
+            $section = $loan->getSection();
+
+            $transaction = $section->transactions()->create([
                 'type' => 'expense',
                 'amount' => $request->amount,
-                'before_balance' => 0,
-                'after_balance' => 0 + $request->amount,
+                'before_balance' => $section->currentBalance(),
+                'after_balance' => $section->currentBalance() + $request->amount,
                 'date' => $request->date,
+                'title' => 'Lending Transaction',
                 'description' => $request->description ?? 'Lend to ' . $user->fullName(),
+            ]);
+
+            $transaction->references()->create([
+                'referenceable_type' => Loan::class,
+                'referenceable_id' => $loan->id,
             ]);
         });
 

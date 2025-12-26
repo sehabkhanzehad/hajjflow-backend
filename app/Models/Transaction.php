@@ -2,11 +2,17 @@
 
 namespace App\Models;
 
+use App\Enums\SectionType;
+use App\Http\Requests\Api\TransactionRequest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Http\Request;
 
 class Transaction extends Model
 {
+    // use HasReferences;
+
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -26,6 +32,30 @@ class Transaction extends Model
     public function year(): BelongsTo
     {
         return $this->belongsTo(Year::class);
+    }
+
+    public function references(): HasMany
+    {
+        return $this->hasMany(Reference::class);
+    }
+
+    public function addReferences(TransactionRequest $request): void
+    {
+        $config = $request->getReferenceConfig();
+
+        if ($config['isArray']) {
+            foreach ($request->{$config['key']} as $id) {
+                $this->references()->create([
+                    'referenceable_type' => $config['type'],
+                    'referenceable_id' => $id,
+                ]);
+            }
+        } elseif ($request->filled($config['key'])) {
+            $this->references()->create([
+                'referenceable_type' => $config['type'],
+                'referenceable_id' => $request->{$config['key']},
+            ]);
+        }
     }
 
     protected static function booted()

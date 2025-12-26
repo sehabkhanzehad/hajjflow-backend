@@ -51,14 +51,20 @@ class BorrowingSectionController extends Controller
 
             $loan->increment('amount', $request->amount);
 
-            $loan->transactions()->create([
-                'section_id' => $loan->getSection()->id,
+            $section = $loan->getSection();
+
+            $transaction = $section->transactions()->create([
                 'type' => 'expense',
                 'amount' => $request->amount,
-                'before_balance' => 0,
-                'after_balance' => 0 + $request->amount,
+                'before_balance' => $section->currentBalance(),
+                'after_balance' => $section->currentBalance() + $request->amount,
                 'date' => $request->date,
                 'description' => $request->description ?? 'Borrow from ' . $user->fullName(),
+            ]);
+
+            $transaction->references()->create([
+                'referenceable_type' => Loan::class,
+                'referenceable_id' => $loan->id,
             ]);
         });
 

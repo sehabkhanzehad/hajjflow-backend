@@ -20,6 +20,7 @@ class SectionResource extends JsonResource
             'attributes' => [
                 'code' => $this->code,
                 'name' => $this->name,
+                'type' => $this->type,
                 'description' => $this->description,
             ],
             'relationships' => [

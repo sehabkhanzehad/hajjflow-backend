@@ -14,8 +14,10 @@ class LoanResource extends JsonResource
             'id' => $this->id,
             'attributes' => [
                 'amount' => $this->amount,
+                'paidAmount' => $this->paid_amount,
                 'direction' => $this->direction,
                 'date' => $this->date ? $this->date->format('Y-m-d') : null,
+                'status' => $this->status,
                 'description' => $this->description,
                 'createdAt' => $this->created_at,
                 'updatedAt' => $this->updated_at,

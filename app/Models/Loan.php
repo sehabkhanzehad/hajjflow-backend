@@ -22,12 +22,6 @@ class Loan extends Model
         return $this->morphTo();
     }
 
-    public function transactions(): HasMany
-    {
-        return $this->hasMany(Transaction::class);
-    }
-
-
     // Helpers
     public function isLend(): bool
     {

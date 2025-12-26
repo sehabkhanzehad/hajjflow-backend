@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\LendingSectionController;
 use App\Http\Controllers\Api\PreRegistrationController;
 use App\Http\Controllers\Api\RegistrationController;
 use App\Http\Controllers\Api\SectionController;
+use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UmrahController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\YearController;
@@ -119,6 +120,18 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::delete('/{borrowing}', [BorrowingSectionController::class, 'destroy']);
             });
         });
+    });
+
+    Route::prefix('transactions')->group(function () {
+        Route::get('sections', [TransactionController::class, 'sections']);
+        Route::get('pre-registrations', [TransactionController::class, 'preRegistrations']);
+        Route::get('registrations', [TransactionController::class, 'registrations']);
+        Route::get('loans', [TransactionController::class, 'loans']);
+
+        Route::get('/', [TransactionController::class, 'index']);
+        Route::post('/', [TransactionController::class, 'store']);
+        Route::get('/{transaction}', [TransactionController::class, 'show']);
+        Route::put('/{transaction}', [TransactionController::class, 'update']);
     });
 
     // User profile routes
