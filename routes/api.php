@@ -109,8 +109,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::prefix('lendings')->group(function () {
                 Route::get('/', [LendingSectionController::class, 'index']);
                 Route::post('/', [LendingSectionController::class, 'store']);
-                Route::put('/{lending}', [LendingSectionController::class, 'update']);
-                Route::delete('/{lending}', [LendingSectionController::class, 'destroy']);
+                Route::get('/{loan}', [LendingSectionController::class, 'show']);
+                Route::get('/{loan}/transactions', [LendingSectionController::class, 'transactions']);
             });
 
             Route::prefix('borrowings')->group(function () {

@@ -23,10 +23,8 @@ return new class extends Migration
             $table->decimal('amount', 12, 2);
             $table->decimal('paid_amount', 12, 2)->default(0);
 
-            $table->date('date');
             $table->string('status')->default('unpaid');
 
-            $table->string('description')->nullable();
             $table->timestamps();
 
             $table->index([
@@ -34,7 +32,6 @@ return new class extends Migration
                 'loanable_id',
                 'direction',
                 'status',
-                'date'
             ]);
 
             $table->unique([

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\LoanResource;
+use App\Http\Resources\Api\TransactionResource;
 use App\Models\Loan;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -45,8 +46,6 @@ class LendingSectionController extends Controller
                 'direction' => 'lend',
             ], [
                 'amount' => 0,
-                'date' => $request->date,
-                'description' => $request->description,
             ]);
 
             $loan->increment('amount', $request->amount);
@@ -59,7 +58,7 @@ class LendingSectionController extends Controller
                 'before_balance' => $section->currentBalance(),
                 'after_balance' => $section->currentBalance() + $request->amount,
                 'date' => $request->date,
-                'title' => 'Lending Transaction',
+                'title' => 'Lend to ' . $user->fullName(),
                 'description' => $request->description ?? 'Lend to ' . $user->fullName(),
             ]);
 
@@ -72,32 +71,13 @@ class LendingSectionController extends Controller
         return $this->success("Lending record created successfully.", 201);
     }
 
-    public function update(Request $request, Loan $loan): JsonResponse
+    public function transactions(Loan $loan): AnonymousResourceCollection
     {
-        $request->validate([
-            "date" => ['required', 'date'],
-            "description" => ['nullable', 'string'],
-        ]);
-
-        DB::transaction(function () use ($request, $loan) {
-            $loan->update([
-                'date' => $request->date,
-                'description' => $request->description,
-            ]);
-
-            // For simplicity, not adjusting transactions here
-        });
-
-        return $this->success("Lending record updated successfully.");
+        return TransactionResource::collection($loan->transactions()->latest()->paginate(10));
     }
 
-    public function destroy(Loan $loan): JsonResponse
+    public function show(Loan $loan): LoanResource
     {
-        DB::transaction(function () use ($loan) {
-            $loan->transactions()->delete();
-            $loan->delete();
-        });
-
-        return $this->success("Lending record deleted successfully.");
+        return new LoanResource($loan->load('loanable'));
     }
 }

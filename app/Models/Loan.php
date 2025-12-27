@@ -4,14 +4,14 @@ namespace App\Models;
 
 use App\Enums\LoanStatus;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Models\Reference;
 
 class Loan extends Model
 {
     protected $casts = [
         'status' => LoanStatus::class,
-        'date' => 'date',
     ];
 
     protected $guarded = ['id'];
@@ -20,6 +20,16 @@ class Loan extends Model
     public function loanable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function references(): MorphMany
+    {
+        return $this->morphMany(Reference::class, 'referenceable');
+    }
+
+    public function transactions(): MorphMany
+    {
+        return $this->references()->join('transactions', 'references.transaction_id', '=', 'transactions.id')->select('transactions.*');
     }
 
     // Helpers

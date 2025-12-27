@@ -45,8 +45,6 @@ class BorrowingSectionController extends Controller
                 'direction' => 'borrow',
             ], [
                 'amount' => 0,
-                'date' => $request->date,
-                'description' => $request->description,
             ]);
 
             $loan->increment('amount', $request->amount);
@@ -54,11 +52,12 @@ class BorrowingSectionController extends Controller
             $section = $loan->getSection();
 
             $transaction = $section->transactions()->create([
-                'type' => 'expense',
+                'type' => 'income',
                 'amount' => $request->amount,
                 'before_balance' => $section->currentBalance(),
                 'after_balance' => $section->currentBalance() + $request->amount,
                 'date' => $request->date,
+                'title' => 'Borrowing' . ' from ' . $user->fullName(),
                 'description' => $request->description ?? 'Borrow from ' . $user->fullName(),
             ]);
 
