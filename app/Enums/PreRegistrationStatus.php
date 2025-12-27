@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Enums\Traits\EnumHelper;
+
 enum PreRegistrationStatus: string
 {
+    use EnumHelper;
+    case Pending = 'pending';
     case Active = 'active';
     case Registered = 'registered';
     case Archived = 'archived';
@@ -13,6 +17,7 @@ enum PreRegistrationStatus: string
 
 // Status Logic:
 
+// pending     = Not registered yet
 // active      = Valid, ready for main reg
 // registered  = Already converted to Main Reg (cannot be registered again)
 // archived    = Time over

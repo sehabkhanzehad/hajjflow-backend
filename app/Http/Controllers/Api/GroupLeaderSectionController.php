@@ -35,6 +35,7 @@ class GroupLeaderSectionController extends Controller
             "phone" => ["nullable", "string", "max:20"],
             "gender" => ["required", "in:male,female,other"],
             'date_of_birth' => ['nullable', 'date'],
+            'pilgrim_required' => ['required', 'boolean'],
             'status' => ['required', 'boolean']
         ]);
 
@@ -60,6 +61,7 @@ class GroupLeaderSectionController extends Controller
             GroupLeader::create([
                 "section_id" => $section->id,
                 "user_id" => $user->id,
+                "pilgrim_required" => $request->pilgrim_required,
                 "group_name" => $request->group_name,
                 'status' => $request->status,
             ]);
@@ -83,6 +85,7 @@ class GroupLeaderSectionController extends Controller
             "phone" => ["nullable", "string", "max:20"],
             "gender" => ["required", "in:male,female,other"],
             'date_of_birth' => ['nullable', 'date'],
+            'pilgrim_required' => ['required', 'boolean'],
             'status' => ['required', 'boolean']
         ]);
 
@@ -108,6 +111,7 @@ class GroupLeaderSectionController extends Controller
 
             $section->groupLeader->update([
                 "group_name" => $request->group_name,
+                'pilgrim_required' => $request->pilgrim_required,
                 'status' => $request->status,
             ]);
         });

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('bank_voucher_no')->nullable();
 
             $table->date('date');
-            $table->string('status')->default('active');
+            $table->string('status');
             $table->date('archive_date')->nullable();
 
             $table->timestamps();

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('section_id')->unique()->constrained()->restrictOnDelete();
             $table->string('group_name');
             $table->boolean('status')->default(true);
+            $table->boolean('pilgrim_required')->default(false); // true = required, false = nullable
             $table->timestamps();
         });
     }

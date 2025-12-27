@@ -19,6 +19,7 @@ class GroupLeaderResource extends JsonResource
             'id' => $this->id,
             'attributes' => [
                 'groupName' => $this->group_name,
+                'pilgrimRequired' => $this->pilgrim_required,
                 'status' => $this->status,
                 'createdAt' => $this->created_at,
                 'updatedAt' => $this->updated_at,

@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Validation\Rule;
 
 class PreRegistrationController extends Controller
 {
@@ -68,6 +69,7 @@ class PreRegistrationController extends Controller
             "is_married" => ["required", "boolean"],
             'date_of_birth' => ['nullable', 'date'],
             'nid' => ['required', 'string', 'max:100', 'unique:users,nid'],
+            'status' => ['required', Rule::in(PreRegistrationStatus::values())],
             'serial_no' => ['required', 'string', 'max:100'],
             'bank_voucher_no' => ['nullable', 'string', 'max:100'],
             'date' => ['required', 'date'],
@@ -94,7 +96,7 @@ class PreRegistrationController extends Controller
             'serial_no' => $request->serial_no,
             'bank_voucher_no' => $request->bank_voucher_no ?? null,
             'date' => $request->date,
-            'status' => PreRegistrationStatus::Active,
+            'status' => $request->status,
         ]);
 
         return $this->success("Pre-registration created successfully.", 201);

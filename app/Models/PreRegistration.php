@@ -16,6 +16,7 @@ class PreRegistration extends Model
         'archive_date' => 'date',
         'status' => PreRegistrationStatus::class,
     ];
+
     public function bank(): BelongsTo
     {
         return $this->belongsTo(Bank::class);

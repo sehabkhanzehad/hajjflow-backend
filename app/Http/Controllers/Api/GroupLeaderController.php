@@ -37,7 +37,8 @@ class GroupLeaderController extends Controller
             'is_married' => ['required', 'boolean'],
             'nid' => ['nullable', 'string', 'max:20'],
             'date_of_birth' => ['nullable', 'date'],
-            'status' => ['required', 'boolean']
+            'status' => ['required', 'boolean'],
+            'pilgrim_required' => ['required', 'boolean']
         ]);
 
         DB::transaction(function () use ($request) {
@@ -66,6 +67,7 @@ class GroupLeaderController extends Controller
                 'section_id' => $section->id,
                 'group_name' => $request->group_name,
                 'status' => $request->status,
+                'pilgrim_required' => $request->pilgrim_required,
             ]);
         });
 
@@ -86,7 +88,8 @@ class GroupLeaderController extends Controller
             'phone' => ['nullable', 'string', 'max:20'],
             'gender' => ['required', 'in:male,female,other'],
             'date_of_birth' => ['nullable', 'date'],
-            'status' => ['required', 'boolean']
+            'status' => ['required', 'boolean'],
+            'pilgrim_required' => ['required', 'boolean']
         ]);
 
         DB::transaction(function () use ($request, $groupLeader) {
@@ -114,6 +117,7 @@ class GroupLeaderController extends Controller
             $groupLeader->update([
                 'group_name' => $request->group_name,
                 'status' => $request->status,
+                'pilgrim_required' => $request->pilgrim_required,
             ]);
         });
 

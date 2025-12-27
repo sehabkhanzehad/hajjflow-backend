@@ -10,6 +10,7 @@ class GroupLeader extends Model
 {
     protected $casts = [
         'status' => 'boolean',
+        'pilgrim_required' => 'boolean',
     ];
     protected $guarded = ['id'];
 
