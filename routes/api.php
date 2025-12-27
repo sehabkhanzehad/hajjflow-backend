@@ -97,7 +97,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('bills')->group(function () {
             Route::get('/', [BillSectionController::class, 'index']);
             Route::post('/', [BillSectionController::class, 'store']);
+            Route::get('/{section}', [BillSectionController::class, 'show']);
             Route::put('/{section}', [BillSectionController::class, 'update']);
+            Route::get('/{section}/transactions', [BillSectionController::class, 'transactions']);
         });
 
         Route::prefix("others")->group(function () {

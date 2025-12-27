@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\SectionResource;
+use App\Http\Resources\Api\TransactionResource;
 use App\Models\Section;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -42,6 +43,11 @@ class BillSectionController extends Controller
         return $this->success("Bill section created successfully.", 201);
     }
 
+    public function show(Section $section): SectionResource
+    {
+        return new SectionResource($section->load('bill'));
+    }
+
     public function update(Request $request, Section $section): JsonResponse
     {
         $validated = $request->validate([
@@ -64,5 +70,11 @@ class BillSectionController extends Controller
         ]);
 
         return $this->success("Bill section updated successfully.");
+    }
+
+
+    public function transactions(Request $request, Section $section): AnonymousResourceCollection
+    {
+        return TransactionResource::collection($section->transactions()->latest()->paginate($request->get('per_page', 15)));
     }
 }
