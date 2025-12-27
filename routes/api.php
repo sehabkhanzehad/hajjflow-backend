@@ -105,7 +105,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix("others")->group(function () {
             Route::get('/', [SectionController::class, 'index']);
             Route::post('/', [SectionController::class, 'store']);
+            Route::get('/{section}', [SectionController::class, 'show']);
             Route::put('/{section}', [SectionController::class, 'update']);
+            Route::get('/{section}/transactions', [SectionController::class, 'transactions']);
         });
 
         Route::delete('/{section}', [SectionController::class, 'destroy']);

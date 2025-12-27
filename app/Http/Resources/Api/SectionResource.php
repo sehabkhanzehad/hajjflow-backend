@@ -22,6 +22,7 @@ class SectionResource extends JsonResource
                 'name' => $this->name,
                 'type' => $this->type,
                 'description' => $this->description,
+                'updatedAt' => $this->updated_at,
             ],
             'relationships' => [
                 "bank" => new BankResource($this->whenLoaded('bank')),
