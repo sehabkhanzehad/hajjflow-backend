@@ -6,6 +6,7 @@ use App\Enums\AccountType;
 use App\Enums\SectionType;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\SectionResource;
+use App\Http\Resources\Api\TransactionResource;
 use App\Models\Bank;
 use App\Models\Section;
 use Illuminate\Http\Request;
@@ -71,6 +72,11 @@ class BankSectionController extends Controller
         return $this->success("Section created successfully.", 201);
     }
 
+    public function show(Section $section): SectionResource
+    {
+        return new SectionResource($section->load('bank'));
+    }
+
     public function update(Request $request, Section $section): JsonResponse
     {
         $request->validate([
@@ -117,5 +123,10 @@ class BankSectionController extends Controller
         });
 
         return $this->success("Bank section updated successfully.");
+    }
+
+    public function transactions(Section $section): AnonymousResourceCollection
+    {
+        return TransactionResource::collection($section->transactions()->latest()->paginate(10));
     }
 }

@@ -41,6 +41,8 @@ class Transaction extends Model
 
     public function addReferences(TransactionRequest $request): void
     {
+        if (!$request->section()->needToAddReferences()) return;
+
         $config = $request->getReferenceConfig();
 
         if ($config['isArray']) {

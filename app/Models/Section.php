@@ -142,4 +142,14 @@ class Section extends Model
     {
         return $this->isType(SectionType::Lend) || $this->isType(SectionType::Borrow);
     }
+
+    public function needToAddReferences(): bool
+    {
+        return in_array($this->type, [
+            SectionType::Registration,
+            SectionType::PreRegistration,
+            SectionType::Lend,
+            SectionType::Borrow,
+        ]);
+    }
 }

@@ -76,7 +76,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('banks')->group(function () {
             Route::get('/', [BankSectionController::class, 'index']);
             Route::post('/', [BankSectionController::class, 'store']);
+            Route::get('/{section}', [BankSectionController::class, 'show']);
             Route::put('/{section}', [BankSectionController::class, 'update']);
+            Route::get('/{section}/transactions', [BankSectionController::class, 'transactions']);
         });
 
         Route::prefix('group-leaders')->group(function () {
