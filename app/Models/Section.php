@@ -118,9 +118,11 @@ class Section extends Model
             } else {
                 return $this->currentBalance() - $request->amount;
             }
-        } else {
-            return $this->currentBalance() + $request->amount;
         }
+
+        return $request->isIncome()
+            ? $this->currentBalance() - $request->amount
+            : $this->currentBalance() + $request->amount;
     }
 
     public function isType(SectionType $type): bool

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\SectionResource;
+use App\Http\Resources\Api\TransactionResource;
 use App\Models\Section;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -101,5 +102,10 @@ class EmployeeSectionController extends Controller
         });
 
         return $this->success("Employee section updated successfully.");
+    }
+
+    public function transactions(Section $section): AnonymousResourceCollection
+    {
+        return TransactionResource::collection($section->transactions()->latest()->paginate(10));
     }
 }
