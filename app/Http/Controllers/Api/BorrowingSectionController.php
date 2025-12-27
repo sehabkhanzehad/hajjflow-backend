@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\LoanResource;
+use App\Http\Resources\Api\TransactionResource;
 use App\Models\Loan;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -70,33 +71,13 @@ class BorrowingSectionController extends Controller
         return $this->success("Borrowing record created successfully.", 201);
     }
 
-    public function update(Request $request, Loan $loan): JsonResponse
+    public function transactions(Loan $loan): AnonymousResourceCollection
     {
-        $request->validate([
-            "amount" => ['required', 'numeric', 'min:0'],
-            "date" => ['required', 'date'],
-            "description" => ['nullable', 'string'],
-        ]);
-
-        DB::transaction(function () use ($request, $loan) {
-            $loan->update([
-                'date' => $request->date,
-                'description' => $request->description,
-            ]);
-
-            // For simplicity, not adjusting transactions here
-        });
-
-        return $this->success("Borrowing record updated successfully.");
+        return TransactionResource::collection($loan->transactions()->latest()->paginate(10));
     }
 
-    public function destroy(Loan $loan): JsonResponse
+    public function show(Loan $loan): LoanResource
     {
-        DB::transaction(function () use ($loan) {
-            $loan->transactions()->delete();
-            $loan->delete();
-        });
-
-        return $this->success("Borrowing record deleted successfully.");
+        return new LoanResource($loan->load('loanable'));
     }
 }
