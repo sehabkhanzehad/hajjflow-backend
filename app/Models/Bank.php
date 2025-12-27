@@ -11,6 +11,7 @@ class Bank extends Model
 {
     protected $casts = [
         'account_type' => AccountType::class,
+        'status' => 'boolean',
     ];
 
     protected $guarded = [
