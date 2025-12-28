@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class GroupLeader extends Model
 {
@@ -32,6 +33,18 @@ class GroupLeader extends Model
     public function preRegistrations(): HasMany // All Pre-Registrations
     {
         return $this->hasMany(PreRegistration::class);
+    }
+
+    public function pilgrims(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Pilgrim::class,
+            PreRegistration::class,
+            'group_leader_id', // Foreign key on pre_registrations table
+            'id',              // Foreign key on pilgrims table
+            'id',              // Local key on group_leaders table
+            'pilgrim_id'       // Local key on pre_registrations table
+        );
     }
 
 

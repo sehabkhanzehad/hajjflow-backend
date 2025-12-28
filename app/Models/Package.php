@@ -23,9 +23,14 @@ class Package extends Model
         return $this->belongsTo(Year::class);
     }
 
-    public function registration(): HasMany
+    public function registrations(): HasMany
     {
         return $this->hasMany(Registration::class);
+    }
+
+    public function umrahs(): HasMany
+    {
+        return $this->hasMany(Umrah::class);
     }
 
     // Scopes

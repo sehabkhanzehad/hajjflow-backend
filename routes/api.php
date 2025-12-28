@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\BankSectionController;
 use App\Http\Controllers\Api\BillSectionController;
 use App\Http\Controllers\Api\BorrowingSectionController;
@@ -21,6 +22,13 @@ use Illuminate\Support\Facades\Route;
 require __DIR__ . '/api/auth.php';
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('analytics')->group(function () {
+        Route::get('dashboard', [AnalyticsController::class, 'dashboard']);
+        Route::get('income-expense', [AnalyticsController::class, 'incomeExpense']);
+        Route::get('top-performers', [AnalyticsController::class, 'topPerformers']);
+        Route::get('years', [AnalyticsController::class, 'getYears']);
+    });
+
     Route::prefix('group-leaders')->group(function () {
         Route::get('/', [GroupLeaderController::class, 'index']);
         Route::post('/', [GroupLeaderController::class, 'store']);
