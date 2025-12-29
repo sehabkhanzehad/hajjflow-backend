@@ -37,7 +37,7 @@ class UserController extends Controller
 
         if ($request->has('avatar')) {
             $user->deleteAvatar();
-            
+
             $user->avatar = $request->hasFile('avatar')
                 ? $request->file('avatar')->store('avatars')
                 : null;

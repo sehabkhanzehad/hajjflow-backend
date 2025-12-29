@@ -155,7 +155,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('user', [UserController::class, 'show']);
     Route::post('user/profile', [UserController::class, 'update']);
     Route::post('user/change-password', [UserController::class, 'changePassword']);
-    Route::post('user/change-password', [UserController::class, 'changePassword']);
 
     Route::prefix('years')->group(function () {
         Route::get('/', [YearController::class, 'index']);
