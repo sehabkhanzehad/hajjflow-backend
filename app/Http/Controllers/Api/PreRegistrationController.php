@@ -70,9 +70,9 @@ class PreRegistrationController extends Controller
             'date_of_birth' => ['nullable', 'date'],
             'nid' => ['required', 'string', 'max:100', 'unique:users,nid'],
             'status' => ['required', Rule::in(PreRegistrationStatus::values())],
-            'serial_no' => ['required', 'string', 'max:100'],
+            'serial_no' => ['nullable', 'string', 'max:100'],
             'bank_voucher_no' => ['nullable', 'string', 'max:100'],
-            'date' => ['required', 'date'],
+            'date' => ['nullable', 'date'],
         ]);
 
         $user = User::create([
@@ -118,9 +118,9 @@ class PreRegistrationController extends Controller
             'date_of_birth' => ['nullable', 'date'],
             'nid' => ['required', 'string', 'max:100', 'unique:users,nid,' . $preRegistration->pilgrim->user->id],
             'status' => ['required', Rule::in(PreRegistrationStatus::values())],
-            'serial_no' => ['required', 'string', 'max:100'],
+            'serial_no' => ['nullable', 'string', 'max:100'],
             'bank_voucher_no' => ['nullable', 'string', 'max:100'],
-            'date' => ['required', 'date'],
+            'date' => ['nullable', 'date'],
         ]);
 
         $user = $preRegistration->pilgrim->user;

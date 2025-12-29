@@ -17,10 +17,10 @@ return new class extends Migration
             $table->foreignId('pilgrim_id')->constrained()->restrictOnDelete();
             $table->foreignId('bank_id')->constrained()->restrictOnDelete();
 
-            $table->string('serial_no'); // Govt Pre-Reg ID
+            $table->string('serial_no')->nullable();
             $table->string('bank_voucher_no')->nullable();
 
-            $table->date('date');
+            $table->date('date')->nullable();
             $table->string('status');
             $table->date('archive_date')->nullable();
 
