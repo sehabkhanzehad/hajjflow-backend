@@ -31,14 +31,13 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
 
-            $table->index([
-                'first_name',
-                'last_name',
-                'email',
-                'phone',
-                'nid',
-                'gender',
-            ], 'users_search_index');
+            $table->index('first_name');
+            $table->index('last_name');
+            $table->index('email');
+            $table->index('username');
+            $table->index('phone');
+            $table->index('nid');
+            $table->index('gender');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
