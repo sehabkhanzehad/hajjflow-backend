@@ -27,11 +27,12 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::updateOrCreate(
-            ['email' => 'test@example.com'],
+            ['email' => 'rajtravels.bd@gmail.com'],
             [
-                'first_name' => 'Test',
-                'last_name' => 'User',
-                'password' => 'password',
+                'first_name' => 'Raj',
+                'last_name' => 'Travels',
+                'username' => 'rajtravels',
+                'password' => 'raj@0935',
                 'gender' => 'male',
             ]
         );
@@ -57,6 +58,7 @@ class DatabaseSeeder extends Seeder
         Section::updateOrCreate([
             'type' => SectionType::PreRegistration,
         ], [
+            'code' => '402.00',
             'name' => 'Pre Registration',
             'description' => 'Pre Registration Section.',
         ]);

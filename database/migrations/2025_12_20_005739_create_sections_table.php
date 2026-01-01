@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('type');
             $table->string('description')->nullable();
             $table->timestamps();
+
+            $table->index(['code', 'name', 'type']);
         });
     }
 

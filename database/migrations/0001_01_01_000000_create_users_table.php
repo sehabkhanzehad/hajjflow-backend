@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('mother_name')->nullable();
             $table->string('father_name')->nullable();
             $table->string('avatar')->nullable();
+            $table->string('username')->nullable()->unique();
             $table->string('email')->unique()->nullable();
             $table->string('phone')->nullable();
             $table->enum('gender', ['male', 'female', 'other']);
@@ -29,6 +30,15 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
+
+            $table->index([
+                'first_name',
+                'last_name',
+                'email',
+                'phone',
+                'nid',
+                'gender',
+            ]);
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

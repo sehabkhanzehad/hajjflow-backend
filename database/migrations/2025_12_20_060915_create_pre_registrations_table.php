@@ -25,6 +25,8 @@ return new class extends Migration
             $table->date('archive_date')->nullable();
 
             $table->timestamps();
+
+            $table->index(['status', 'date', 'serial_no']);
         });
     }
 

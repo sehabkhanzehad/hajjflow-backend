@@ -24,7 +24,11 @@ return new class extends Migration
             $table->boolean('status')->default(true);
             $table->timestamps();
 
-            $table->index(['type', 'status']);
+            $table->index([
+                'type',
+                'status',
+                'name',
+            ]);
         });
     }
 

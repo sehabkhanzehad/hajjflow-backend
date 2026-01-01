@@ -30,6 +30,8 @@ return new class extends Migration
             $table->string('website')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
+
+            $table->index(['branch', 'name', 'account_number', 'status']);
         });
     }
 

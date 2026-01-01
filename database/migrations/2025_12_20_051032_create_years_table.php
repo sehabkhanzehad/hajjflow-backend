@@ -18,6 +18,8 @@ return new class extends Migration
             $table->date('end_date');
             $table->boolean('status')->default(false);
             $table->timestamps();
+
+            $table->index(['name', 'status', 'start_date', 'end_date']);
         });
     }
 

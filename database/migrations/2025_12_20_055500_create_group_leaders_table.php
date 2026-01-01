@@ -19,6 +19,8 @@ return new class extends Migration
             $table->boolean('status')->default(true);
             $table->boolean('pilgrim_required')->default(false); // true = required, false = nullable
             $table->timestamps();
+
+            $table->index(['group_name', 'status', 'pilgrim_required']);
         });
     }
 
