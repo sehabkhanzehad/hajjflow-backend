@@ -18,8 +18,57 @@ use App\Http\Controllers\Api\UmrahController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\YearController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 
 require __DIR__ . '/api/auth.php';
+
+Route::get('/health-check', function () {
+    try {
+        $dbConnected = false;
+        $dbError = null;
+
+        try {
+            DB::connection()->getPdo();
+            $dbConnected = true;
+        } catch (\Exception $e) {
+            $dbError = $e->getMessage();
+        }
+
+        $dbInfo = db_info();
+
+        return response()->json([
+            'status' => 'alive',
+            'app' => [
+                'name' => config('app.name'),
+                'env' => config('app.env'),
+                'debug' => config('app.debug'),
+                'url' => config('app.url'),
+                'timezone' => config('app.timezone'),
+            ],
+            'database' => [
+                'connected' => $dbConnected,
+                'error' => $dbError,
+                'environment' => $dbInfo['environment'],
+                'host' => $dbInfo['host'],
+                'database' => $dbInfo['database'],
+                'connection_type' => $dbInfo['connection'],
+                'is_local' => $dbInfo['is_local'],
+                'is_production' => $dbInfo['is_production'],
+            ],
+            'server' => [
+                'php_version' => PHP_VERSION,
+                'laravel_version' => app()->version(),
+                'timestamp' => now()->toIso8601String(),
+                'timezone' => date_default_timezone_get(),
+            ],
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('analytics')->group(function () {
