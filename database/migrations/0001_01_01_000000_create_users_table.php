@@ -38,7 +38,7 @@ return new class extends Migration
                 'phone',
                 'nid',
                 'gender',
-            ]);
+            ], 'users_search_index');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
