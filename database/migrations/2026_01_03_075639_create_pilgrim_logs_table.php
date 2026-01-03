@@ -14,14 +14,16 @@ return new class extends Migration
         Schema::create('pilgrim_logs', function (Blueprint $table) {
             $table->foreignId('pilgrim_id')->constrained()->restrictOnDelete();
 
-            // Polymorphic relation (Pre-Reg othoba Main-Reg er history)
-            // $table->unsignedBigInteger('reference_id');
-            // $table->string('reference_type'); // 'App\Models\PreRegistration' or 'App\Models\MainRegistration'
+            $table->string('reference_id');
+            $table->string('reference_type');
 
-            $table->string('type'); // 'created', 'transferred', 'converted_to_main', 'expired', 'cancelled'
-            $table->text('description')->nullable(); // e.g., "Transferred to Rahim ID: 50"
-
+            $table->string('type');
+            $table->text('description');
             $table->timestamps();
+
+            $table->index(['reference_id', 'reference_type']);
+            $table->index('type');
+            $table->index('created_at');
         });
     }
 
@@ -33,5 +35,3 @@ return new class extends Migration
         Schema::dropIfExists('pilgrim_logs');
     }
 };
-
-// tODO: IF PAID AMOUNT THEN ALSO ADD LOG, AND CONNECT WITH TRANSACTIONS 

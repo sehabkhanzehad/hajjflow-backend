@@ -79,6 +79,16 @@ class TransactionController extends Controller
     {
         $section = $request->section();
 
+        if ($section->isGroupLeader()) {
+            return $this->error('Group Leader section transactions are not supported yet.', 400);
+        }
+
+        if ($section->isloan()) {
+            // Todo: Implement loan transaction  
+            //Handle Loan specific logic like deducting amount from loan balance
+            return $this->error('Loan section transactions are not supported yet.', 400);
+        }
+
         // $isIncome = $request->type === 'income';
 
         $transaction = $section->transactions()->create([
@@ -94,9 +104,7 @@ class TransactionController extends Controller
 
         $transaction->addReferences($request);
 
-        if ($section->isloan()) {
-            // Loan specific logic
-        }
+
 
         return $this->success("Transaction created successfully.", 201);
     }

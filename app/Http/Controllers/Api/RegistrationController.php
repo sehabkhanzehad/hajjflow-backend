@@ -81,6 +81,7 @@ class  RegistrationController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        return $this->error("This feature is under maintenance.", 503);
         $request->validate([
             "pre_registration_id" => ["required", "integer", "exists:pre_registrations,id"],
             "package_id" => ["required", "integer", "exists:packages,id"],

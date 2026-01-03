@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\PilgrimLogType;
 use App\Enums\PreRegistrationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\PreRegistrationResource;
 use App\Models\Bank;
 use App\Models\GroupLeader;
+use App\Models\PilgrimLog;
 use App\Models\PreRegistration;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -69,7 +71,7 @@ class PreRegistrationController extends Controller
             "is_married" => ["required", "boolean"],
             'date_of_birth' => ['nullable', 'date'],
             'nid' => ['required', 'string', 'max:100', 'unique:users,nid'],
-            'status' => ['required', Rule::in(PreRegistrationStatus::values())],
+            'status' => ['required', Rule::in(['active', 'pending'])],
             'serial_no' => ['nullable', 'string', 'max:100'],
             'bank_voucher_no' => ['nullable', 'string', 'max:100'],
             'date' => ['nullable', 'date'],
@@ -90,7 +92,7 @@ class PreRegistrationController extends Controller
 
         $pilgrim = $user->pilgrim()->create();
 
-        $pilgrim->preRegistrations()->create([
+        $preReg = $pilgrim->preRegistrations()->create([
             'group_leader_id' => $request->group_leader_id,
             'bank_id' => $request->bank_id,
             'serial_no' => $request->serial_no,
@@ -98,6 +100,16 @@ class PreRegistrationController extends Controller
             'date' => $request->date,
             'status' => $request->status,
         ]);
+
+        if ($preReg->isActive()) {
+            PilgrimLog::add(
+                $pilgrim,
+                $preReg->id,
+                PreRegistration::class,
+                PilgrimLogType::HajjPreRegistered,
+                "হজ প্রি-রেজিস্ট্রেশন করা হয়েছে।"
+            );
+        }
 
         return $this->success("Pre-registration created successfully.", 201);
     }

@@ -17,6 +17,7 @@ class PreRegistration extends Model
         'status' => PreRegistrationStatus::class,
     ];
 
+    // Relationships
     public function bank(): BelongsTo
     {
         return $this->belongsTo(Bank::class);
@@ -41,5 +42,11 @@ class PreRegistration extends Model
     public function scopeActive($query)
     {
         return $query->whereStatus(PreRegistrationStatus::Active);
+    }
+
+    // Helpers
+    public function isActive(): bool
+    {
+        return $this->status === PreRegistrationStatus::Active;
     }
 }

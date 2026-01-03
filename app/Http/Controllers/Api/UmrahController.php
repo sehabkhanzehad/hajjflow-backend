@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\PilgrimLogType;
 use App\Enums\UmrahStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\UmrahResource;
 use App\Models\GroupLeader;
 use App\Models\Package;
+use App\Models\Pilgrim;
+use App\Models\PilgrimLog;
 use App\Models\Umrah;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Validation\Rule;
 
 class UmrahController extends Controller
 {
@@ -85,11 +87,11 @@ class UmrahController extends Controller
             'new_pilgrim.nid' => ['nullable', 'string', 'unique:users,nid'],
             'new_pilgrim.date_of_birth' => ['nullable', 'date'],
             'package_id' => ['required', 'exists:packages,id'],
-            'status' => ['required', 'string', Rule::in(UmrahStatus::values())],
         ]);
 
         if ($request->has('pilgrim_id')) {
             $pilgrimId = $validated['pilgrim_id'];
+            $pilgrim = Pilgrim::find($pilgrimId);
         } else {
             $user = User::create([
                 'first_name' => $validated['new_pilgrim']['first_name'],
@@ -105,12 +107,20 @@ class UmrahController extends Controller
             $pilgrimId = $pilgrim->id;
         }
 
-        Umrah::create([
+        $umrah = Umrah::create([
             'group_leader_id' => $validated['group_leader_id'],
             'pilgrim_id' => $pilgrimId,
             'package_id' => $validated['package_id'],
-            'status' => $validated['status'],
+            'status' => UmrahStatus::Registered,
         ]);
+
+        PilgrimLog::add(
+            $pilgrim,
+            $umrah->id,
+            Umrah::class,
+            PilgrimLogType::UmrahRegistered,
+            "উমরাহ রেজিস্ট্রেশন সম্পন্ন হয়েছে।"
+        );
 
         return $this->success("Umrah created successfully.");
     }
@@ -121,7 +131,6 @@ class UmrahController extends Controller
             'group_leader_id' => ['required', 'exists:group_leaders,id'],
             'pilgrim_id' => ['required', 'exists:pilgrims,id'],
             'package_id' => ['required', 'exists:packages,id'],
-            'status' => ['required', 'string', Rule::in(UmrahStatus::values())],
         ]);
 
         $umrah->update($validated);
@@ -131,8 +140,12 @@ class UmrahController extends Controller
 
     public function destroy(Umrah $umrah): JsonResponse
     {
-        $umrah->delete();
+        return $this->error("Umrah deletion is currently under maintenance.");
 
-        return $this->success("Umrah deleted successfully.");
+        // $umrah->delete();
+        //delete pilgrim if no other records
+        // deltete user if no other records
+
+        // return $this->success("Umrah deleted successfully.");
     }
 }
