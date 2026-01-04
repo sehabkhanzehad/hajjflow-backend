@@ -60,7 +60,8 @@ class PreRegistrationController extends Controller
     {
         $request->validate([
             "group_leader_id" => ["required", "integer", "exists:group_leaders,id"],
-            "bank_id" => ["required", "integer", "exists:banks,id"],
+            'status' => ['required', Rule::in(['active', 'pending'])],
+            "bank_id" => ['required_if:status,active', "integer", "exists:banks,id"],
             "first_name" => ["required", "string", "max:255"],
             "last_name" => ["nullable", "string", "max:255"],
             "mother_name" => ["nullable", "string", "max:255"],
@@ -71,10 +72,9 @@ class PreRegistrationController extends Controller
             "is_married" => ["required", "boolean"],
             'date_of_birth' => ['nullable', 'date'],
             'nid' => ['required', 'string', 'max:100', 'unique:users,nid'],
-            'status' => ['required', Rule::in(['active', 'pending'])],
-            'serial_no' => ['nullable', 'string', 'max:100'],
-            'bank_voucher_no' => ['nullable', 'string', 'max:100'],
-            'date' => ['nullable', 'date'],
+            'serial_no' => ['required_if:status,active', 'string', 'max:100'],
+            'bank_voucher_no' => ['required_if:status,active', 'string', 'max:100'],
+            'date' => ['required_if:status,active', 'date'],
         ]);
 
         $user = User::create([
