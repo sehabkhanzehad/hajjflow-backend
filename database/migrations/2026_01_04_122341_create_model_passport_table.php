@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Ensure unique passport per model
-            $table->unique(['passport_id', 'passportable_id', 'passportable_type']);
+            $table->unique(['passport_id', 'passportable_id', 'passportable_type'], 'unique_passport_per_model');
         });
     }
 
