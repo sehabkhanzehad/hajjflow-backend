@@ -38,6 +38,16 @@ class Pilgrim extends Model
         return $this->hasMany(Registration::class);
     }
 
+    public function passports(): HasMany
+    {
+        return $this->hasMany(Passport::class);
+    }
+
+    public function currentPassport(): HasOne
+    {
+        return $this->hasOne(Passport::class)->latestOfMany();
+    }
+
 
     // public function groupLeader()
     // {

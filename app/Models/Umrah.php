@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Enums\UmrahStatus;
+use App\Models\Traits\HasPassport;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Umrah extends Model
 {
+    use HasPassport;
+
     protected $casts = [
         'status' => UmrahStatus::class,
     ];

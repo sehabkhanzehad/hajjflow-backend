@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\UmrahResource;
 use App\Models\GroupLeader;
 use App\Models\Package;
+use App\Models\Passport;
 use App\Models\Pilgrim;
 use App\Models\PilgrimLog;
 use App\Models\Umrah;
@@ -15,6 +16,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\Rule;
 
 class UmrahController extends Controller
 {
@@ -87,8 +89,41 @@ class UmrahController extends Controller
             'new_pilgrim.nid' => ['nullable', 'string', 'unique:users,nid'],
             'new_pilgrim.date_of_birth' => ['nullable', 'date'],
             'package_id' => ['required', 'exists:packages,id'],
+
+            // Passport validation
+            'passport_id' => ['nullable', 'exists:passports,id'],
+            'new_passport' => ['nullable', 'array'],
+            'new_passport.passport_number' => [
+                Rule::requiredIf(function () use ($request) {
+                    return !$request->passport_id && $request->has('new_passport') && collect($request->new_passport)->filter()->isNotEmpty();
+                }),
+                'string',
+                'unique:passports,passport_number'
+            ],
+            'new_passport.issue_date' => [
+                Rule::requiredIf(function () use ($request) {
+                    return !$request->passport_id && $request->has('new_passport') && collect($request->new_passport)->filter()->isNotEmpty();
+                }),
+                'date'
+            ],
+            'new_passport.expiry_date' => [
+                Rule::requiredIf(function () use ($request) {
+                    return !$request->passport_id && $request->has('new_passport') && collect($request->new_passport)->filter()->isNotEmpty();
+                }),
+                'date',
+                'after:new_passport.issue_date'
+            ],
+            'new_passport.passport_type' => [
+                Rule::requiredIf(function () use ($request) {
+                    return !$request->passport_id && $request->has('new_passport') && collect($request->new_passport)->filter()->isNotEmpty();
+                }),
+                'in:ordinary,official,diplomatic'
+            ],
+            'new_passport.file' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+            'new_passport.notes' => ['nullable', 'string'],
         ]);
 
+        // Handle Pilgrim
         if ($request->has('pilgrim_id')) {
             $pilgrimId = $validated['pilgrim_id'];
             $pilgrim = Pilgrim::find($pilgrimId);
@@ -107,12 +142,45 @@ class UmrahController extends Controller
             $pilgrimId = $pilgrim->id;
         }
 
+        // Handle Passport
+        $passport = null;
+        if ($request->has('passport_id')) {
+            // Use existing passport
+            $passport = Passport::find($validated['passport_id']);
+        } elseif ($request->has('new_passport') && collect($request->new_passport)->filter()->isNotEmpty()) {
+            // Create new passport
+
+            // handle file upload if exists
+            if ($request->hasFile('new_passport.file')) {
+                $file = $request->file('new_passport.file');
+                $passportNumber = $validated['new_passport']['passport_number'];
+                $extension = $file->getClientOriginalExtension();
+                $fileName = "$passportNumber.$extension";
+                $filePath = $file->storeAs('passports', $fileName);
+                $validated['new_passport']['file_path'] = $filePath;
+            }
+
+            $passport = Passport::create([
+                'pilgrim_id' => $pilgrimId,
+                'passport_number' => $validated['new_passport']['passport_number'],
+                'issue_date' => $validated['new_passport']['issue_date'],
+                'expiry_date' => $validated['new_passport']['expiry_date'],
+                'passport_type' => $validated['new_passport']['passport_type'],
+                'file_path' => $validated['new_passport']['file_path'] ?? null,
+                'notes' => $validated['new_passport']['notes'] ?? null,
+            ]);
+        }
+
+        // Create Umrah
         $umrah = Umrah::create([
             'group_leader_id' => $validated['group_leader_id'],
             'pilgrim_id' => $pilgrimId,
             'package_id' => $validated['package_id'],
             'status' => UmrahStatus::Registered,
         ]);
+
+        // Attach passport to Umrah if exists
+        if ($passport) $umrah->assignPassport($passport);
 
         PilgrimLog::add(
             $pilgrim,
