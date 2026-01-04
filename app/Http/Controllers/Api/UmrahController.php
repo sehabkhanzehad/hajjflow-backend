@@ -17,12 +17,13 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class UmrahController extends Controller
 {
     public function index(): AnonymousResourceCollection
     {
-        return UmrahResource::collection(Umrah::with(['year', 'groupLeader', 'pilgrim.user', 'package'])->paginate(request()->get('per_page', 10)));
+        return UmrahResource::collection(Umrah::with(['year', 'groupLeader', 'pilgrim.user', 'package', 'passports'])->paginate(request()->get('per_page', 10)));
     }
 
     public function packages(): JsonResponse
@@ -115,7 +116,7 @@ class UmrahController extends Controller
             'new_pilgrim.email' => ['nullable', 'email', 'unique:users,email'],
             'new_pilgrim.phone' => ['nullable', 'string'],
             'new_pilgrim.gender' => ['required_with:new_pilgrim', 'in:male,female,other'],
-            'new_pilgrim.is_married' => ['nullable', 'boolean'],
+            'new_pilgrim.is_married' => ['required_with:new_pilgrim', 'boolean'],
             'new_pilgrim.nid' => ['nullable', 'string', 'unique:users,nid'],
             'new_pilgrim.birth_certificate_number' => ['nullable', 'string', 'unique:users,birth_certificate_number'],
             'new_pilgrim.date_of_birth' => ['nullable', 'date'],
@@ -154,95 +155,113 @@ class UmrahController extends Controller
             'new_passport.notes' => ['nullable', 'string'],
         ]);
 
-        // Handle Pilgrim
-        if ($request->has('pilgrim_id')) {
-            $pilgrimId = $validated['pilgrim_id'];
-            $pilgrim = Pilgrim::find($pilgrimId);
-        } else {
-            $user = User::create([
-                'first_name' => $validated['new_pilgrim']['first_name'],
-                'first_name_bangla' => $validated['new_pilgrim']['first_name_bangla'],
-                'last_name' => $validated['new_pilgrim']['last_name'] ?? null,
-                'last_name_bangla' => $validated['new_pilgrim']['last_name_bangla'] ?? null,
-                'mother_name' => $validated['new_pilgrim']['mother_name'] ?? null,
-                'mother_name_bangla' => $validated['new_pilgrim']['mother_name_bangla'] ?? null,
-                'father_name' => $validated['new_pilgrim']['father_name'] ?? null,
-                'father_name_bangla' => $validated['new_pilgrim']['father_name_bangla'] ?? null,
-                'email' => $validated['new_pilgrim']['email'] ?? null,
-                'phone' => $validated['new_pilgrim']['phone'] ?? null,
-                'gender' => $validated['new_pilgrim']['gender'],
-                'is_married' => $validated['new_pilgrim']['is_married'] ?? false,
-                'nid' => $validated['new_pilgrim']['nid'] ?? null,
-                'birth_certificate_number' => $validated['new_pilgrim']['birth_certificate_number'] ?? null,
-                'date_of_birth' => $validated['new_pilgrim']['date_of_birth'] ?? null,
-            ]);
-            $pilgrim = $user->pilgrim()->create();
-            $pilgrimId = $pilgrim->id;
-        }
+        // Handle Pilgrim, Passport, and Umrah creation in a transaction
+        try {
+            DB::beginTransaction();
 
-        // Handle Passport
-        $passport = null;
-        if ($request->has('passport_id')) {
-            // Use existing passport
-            $passport = Passport::find($validated['passport_id']);
-        } elseif ($request->has('new_passport') && collect($request->new_passport)->filter()->isNotEmpty()) {
-            // Create new passport
-
-            // handle file upload if exists
-            if ($request->hasFile('new_passport.file')) {
-                $file = $request->file('new_passport.file');
-                $passportNumber = $validated['new_passport']['passport_number'];
-                $extension = $file->getClientOriginalExtension();
-                $fileName = "$passportNumber.$extension";
-                $filePath = $file->storeAs('passports', $fileName);
-                $validated['new_passport']['file_path'] = $filePath;
+            // Handle Pilgrim
+            if ($request->has('pilgrim_id')) {
+                $pilgrimId = $validated['pilgrim_id'];
+                $pilgrim = Pilgrim::find($pilgrimId);
+            } else {
+                $user = User::create([
+                    'first_name' => $validated['new_pilgrim']['first_name'],
+                    'last_name' => $validated['new_pilgrim']['last_name'] ?? null,
+                    'full_name' => trim($validated['new_pilgrim']['first_name'] . ' ' . ($validated['new_pilgrim']['last_name'] ?? '')),
+                    'first_name_bangla' => $validated['new_pilgrim']['first_name_bangla'],
+                    'last_name_bangla' => $validated['new_pilgrim']['last_name_bangla'] ?? null,
+                    'full_name_bangla' => trim($validated['new_pilgrim']['first_name_bangla'] . ' ' . ($validated['new_pilgrim']['last_name_bangla'] ?? '')),
+                    'mother_name' => $validated['new_pilgrim']['mother_name'] ?? null,
+                    'mother_name_bangla' => $validated['new_pilgrim']['mother_name_bangla'] ?? null,
+                    'father_name' => $validated['new_pilgrim']['father_name'] ?? null,
+                    'father_name_bangla' => $validated['new_pilgrim']['father_name_bangla'] ?? null,
+                    'email' => $validated['new_pilgrim']['email'] ?? null,
+                    'phone' => $validated['new_pilgrim']['phone'] ?? null,
+                    'gender' => $validated['new_pilgrim']['gender'],
+                    'is_married' => $validated['new_pilgrim']['is_married'] ?? false,
+                    'nid' => $validated['new_pilgrim']['nid'] ?? null,
+                    'birth_certificate_number' => $validated['new_pilgrim']['birth_certificate_number'] ?? null,
+                    'date_of_birth' => $validated['new_pilgrim']['date_of_birth'] ?? null,
+                ]);
+                $pilgrim = $user->pilgrim()->create();
+                $pilgrimId = $pilgrim->id;
             }
 
-            $passport = Passport::create([
+            // Handle Passport
+            $passport = null;
+            if ($request->has('passport_id')) {
+                // Use existing passport
+                $passport = Passport::find($validated['passport_id']);
+            } elseif ($request->has('new_passport') && collect($request->new_passport)->filter()->isNotEmpty()) {
+                // Create new passport
+
+                // handle file upload if exists
+                if ($request->hasFile('new_passport.file')) {
+                    $file = $request->file('new_passport.file');
+                    $passportNumber = $validated['new_passport']['passport_number'];
+                    $extension = $file->getClientOriginalExtension();
+                    $fileName = "$passportNumber.$extension";
+                    $filePath = $file->storeAs('passports', $fileName);
+                    $validated['new_passport']['file_path'] = $filePath;
+                }
+
+                $passport = Passport::create([
+                    'pilgrim_id' => $pilgrimId,
+                    'passport_number' => $validated['new_passport']['passport_number'],
+                    'issue_date' => $validated['new_passport']['issue_date'],
+                    'expiry_date' => $validated['new_passport']['expiry_date'],
+                    'passport_type' => $validated['new_passport']['passport_type'],
+                    'file_path' => $validated['new_passport']['file_path'] ?? null,
+                    'notes' => $validated['new_passport']['notes'] ?? null,
+                ]);
+            }
+
+            // Create Umrah
+            $umrah = Umrah::create([
+                'group_leader_id' => $validated['group_leader_id'],
                 'pilgrim_id' => $pilgrimId,
-                'passport_number' => $validated['new_passport']['passport_number'],
-                'issue_date' => $validated['new_passport']['issue_date'],
-                'expiry_date' => $validated['new_passport']['expiry_date'],
-                'passport_type' => $validated['new_passport']['passport_type'],
-                'file_path' => $validated['new_passport']['file_path'] ?? null,
-                'notes' => $validated['new_passport']['notes'] ?? null,
+                'package_id' => $validated['package_id'],
+                'status' => UmrahStatus::Registered,
             ]);
+
+            // Attach passport to Umrah if exists
+            if ($passport) $umrah->assignPassport($passport);
+
+            PilgrimLog::add(
+                $pilgrim,
+                $umrah->id,
+                Umrah::class,
+                PilgrimLogType::UmrahRegistered,
+                "উমরাহ রেজিস্ট্রেশন সম্পন্ন হয়েছে।"
+            );
+
+            DB::commit();
+
+            return $this->success("Umrah created successfully.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->error("Failed to create Umrah: " . $e->getMessage());
         }
-
-        // Create Umrah
-        $umrah = Umrah::create([
-            'group_leader_id' => $validated['group_leader_id'],
-            'pilgrim_id' => $pilgrimId,
-            'package_id' => $validated['package_id'],
-            'status' => UmrahStatus::Registered,
-        ]);
-
-        // Attach passport to Umrah if exists
-        if ($passport) $umrah->assignPassport($passport);
-
-        PilgrimLog::add(
-            $pilgrim,
-            $umrah->id,
-            Umrah::class,
-            PilgrimLogType::UmrahRegistered,
-            "উমরাহ রেজিস্ট্রেশন সম্পন্ন হয়েছে।"
-        );
-
-        return $this->success("Umrah created successfully.");
     }
 
-    public function update(Request $request, Umrah $umrah): JsonResponse
+    public function show(Umrah $umrah): UmrahResource
     {
-        $validated = $request->validate([
-            'group_leader_id' => ['required', 'exists:group_leaders,id'],
-            'pilgrim_id' => ['required', 'exists:pilgrims,id'],
-            'package_id' => ['required', 'exists:packages,id'],
-        ]);
-
-        $umrah->update($validated);
-
-        return $this->success("Umrah updated successfully.");
+        $umrah->load(['year', 'groupLeader', 'pilgrim.user', 'package', 'passports']);
+        return new UmrahResource($umrah);
     }
+
+    // public function update(Request $request, Umrah $umrah): JsonResponse
+    // {
+    //     $validated = $request->validate([
+    //         'group_leader_id' => ['required', 'exists:group_leaders,id'],
+    //         'pilgrim_id' => ['required', 'exists:pilgrims,id'],
+    //         'package_id' => ['required', 'exists:packages,id'],
+    //     ]);
+
+    //     $umrah->update($validated);
+
+    //     return $this->success("Umrah updated successfully.");
+    // }
 
     public function destroy(Umrah $umrah): JsonResponse
     {

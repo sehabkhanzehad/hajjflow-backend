@@ -23,6 +23,10 @@ class UmrahResource extends JsonResource
                 'groupLeader' => new GroupLeaderResource($this->whenLoaded('groupLeader')),
                 'pilgrim' => new PilgrimResource($this->whenLoaded('pilgrim')),
                 'package' => new PackageResource($this->whenLoaded('package')),
+                'passport' => $this->when($this->relationLoaded('passports'), function () {
+                    $passport = $this->passports->first();
+                    return $passport ? new PassportResource($passport) : null;
+                }),
             ],
         ];
     }

@@ -3,29 +3,35 @@
 namespace App\Models\Traits;
 
 use App\Models\Passport;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasPassport
 {
     // Relations
-    public function passport(): MorphOne
+    public function passports(): MorphToMany
     {
-        return $this->morphOne(Passport::class, 'passportable', 'model_passport')->withTimestamps();
+        return $this->morphToMany(Passport::class, 'passportable', 'model_passport')
+            ->withTimestamps();
+    }
+
+    public function passport(): ?Passport
+    {
+        return $this->passports()->first();
     }
 
     /* Helpers */
     public function hasPassport(): bool
     {
-        return $this->passport()->exists();
+        return $this->passports()->exists();
     }
 
     public function assignPassport(Passport $passport): void
     {
-        $this->passport()->save($passport);
+        $this->passports()->sync([$passport->id]);
     }
 
     public function removePassport(): void
     {
-        $this->passport()->delete();
+        $this->passports()->detach();
     }
 }

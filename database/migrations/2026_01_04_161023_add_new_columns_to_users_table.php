@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('full_name_bangla')->nullable()->after('last_name_bangla');
             $table->string('mother_name_bangla')->nullable()->after('mother_name');
             $table->string('father_name_bangla')->nullable()->after('father_name');
-            $table->string('birth_certificate_number')->nullable()->after('nid');
+            $table->string('birth_certificate_number')->nullable()->unique()->after('nid');
 
             $table->index('full_name');
             $table->index('full_name_bangla');

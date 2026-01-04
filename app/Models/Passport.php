@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Passport extends Model
 {
@@ -18,5 +19,14 @@ class Passport extends Model
     public function pilgrim(): BelongsTo
     {
         return $this->belongsTo(Pilgrim::class);
+    }
+
+    public function getFilePathAttribute(): ?string
+    {
+        $filePath = $this->attributes['file_path'];
+
+        if (!$filePath) return null;
+
+        return Storage::url($filePath);
     }
 }
