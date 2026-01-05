@@ -117,6 +117,12 @@ Route::middleware('auth:sanctum')->group(function () {
         // Route::put('/{umrah}', [UmrahController::class, 'update']);
         Route::delete('/{umrah}', [UmrahController::class, 'destroy']);
 
+        // Pilgrim update routes
+        Route::put('/{umrah}/pilgrim/personal-info', [UmrahController::class, 'updatePilgrimPersonalInfo']);
+        Route::put('/{umrah}/pilgrim/contact-info', [UmrahController::class, 'updatePilgrimContactInfo']);
+        Route::post('/{umrah}/pilgrim/avatar', [UmrahController::class, 'updatePilgrimAvatar']);
+
+        // Passport routes
         Route::post('/{umrah}/passport', [UmrahController::class, 'addPassport']);
         Route::put('/passport/{passport}', [UmrahController::class, 'updatePassport']);
     });

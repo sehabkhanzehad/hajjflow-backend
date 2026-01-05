@@ -338,18 +338,78 @@ class UmrahController extends Controller
         return new UmrahResource($umrah);
     }
 
-    // public function update(Request $request, Umrah $umrah): JsonResponse
-    // {
-    //     $validated = $request->validate([
-    //         'group_leader_id' => ['required', 'exists:group_leaders,id'],
-    //         'pilgrim_id' => ['required', 'exists:pilgrims,id'],
-    //         'package_id' => ['required', 'exists:packages,id'],
-    //     ]);
+    public function updatePilgrimPersonalInfo(Request $request, Umrah $umrah): JsonResponse
+    {
+        $validated = $request->validate([
+            'first_name' => ['required', 'string'],
+            'first_name_bangla' => ['required', 'string'],
+            'last_name' => ['nullable', 'string'],
+            'last_name_bangla' => ['nullable', 'string'],
+            'father_name' => ['nullable', 'string'],
+            'father_name_bangla' => ['nullable', 'string'],
+            'mother_name' => ['nullable', 'string'],
+            'mother_name_bangla' => ['nullable', 'string'],
+        ]);
 
-    //     $umrah->update($validated);
+        $user = $umrah->pilgrim->user;
+        $user->update([
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'] ?? null,
+            'full_name' => trim($validated['first_name'] . ' ' . ($validated['last_name'] ?? '')),
+            'first_name_bangla' => $validated['first_name_bangla'],
+            'last_name_bangla' => $validated['last_name_bangla'] ?? null,
+            'full_name_bangla' => trim($validated['first_name_bangla'] . ' ' . ($validated['last_name_bangla'] ?? '')),
+            'father_name' => $validated['father_name'] ?? null,
+            'father_name_bangla' => $validated['father_name_bangla'] ?? null,
+            'mother_name' => $validated['mother_name'] ?? null,
+            'mother_name_bangla' => $validated['mother_name_bangla'] ?? null,
+        ]);
 
-    //     return $this->success("Umrah updated successfully.");
-    // }
+        return $this->success("Personal information updated successfully.");
+    }
+
+    public function updatePilgrimContactInfo(Request $request, Umrah $umrah): JsonResponse
+    {
+        $user = $umrah->pilgrim->user;
+
+        $validated = $request->validate([
+            'email' => ['nullable', 'email', 'unique:users,email,' . $user->id],
+            'phone' => ['nullable', 'string'],
+            'gender' => ['required', 'in:male,female,other'],
+            'is_married' => ['required', 'boolean'],
+            'nid' => ['nullable', 'string', 'unique:users,nid,' . $user->id],
+            'birth_certificate_number' => ['nullable', 'string', 'unique:users,birth_certificate_number,' . $user->id],
+            'date_of_birth' => ['nullable', 'date'],
+        ]);
+
+        $user->update($validated);
+
+        return $this->success("Contact & identification updated successfully.");
+    }
+
+    public function updatePilgrimAvatar(Request $request, Umrah $umrah): JsonResponse
+    {
+        $request->validate([
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+        ]);
+
+        $user = $umrah->pilgrim->user;
+
+        if ($request->has('avatar')) {
+            $user->deleteAvatar();
+
+            $user->avatar = $request->hasFile('avatar')
+                ? $request->file('avatar')->storeAs(
+                    'avatars',
+                    $user->first_name . '_' . time() . '_' . uniqid() . '.' . $request->file('avatar')->getClientOriginalExtension()
+                )
+                : null;
+        }
+
+        $user->save();
+
+        return $this->success("Avatar updated successfully.");
+    }
 
     public function destroy(Umrah $umrah): JsonResponse
     {
