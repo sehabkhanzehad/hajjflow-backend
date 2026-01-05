@@ -7,8 +7,8 @@ enum PilgrimLogType: string
     case UmrahRegistered = 'umrah_registered'; // ✅
 
         //Todo: think when implement it, keep store before status, when change status
-        // case UmrahCancelled = 'umrah_cancelled';
-        // case UmrahCompleted = 'umrah_completed';
+    case UmrahCancelled = 'umrah_cancelled';
+    case UmrahCompleted = 'umrah_completed';
 
         // Todo: think when implement it, keep store before status, when change status
     case HajjPreRegistered = 'hajj_pre_registered';

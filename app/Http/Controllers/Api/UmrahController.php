@@ -18,7 +18,6 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class UmrahController extends Controller
 {
@@ -409,6 +408,64 @@ class UmrahController extends Controller
         $user->save();
 
         return $this->success("Avatar updated successfully.");
+    }
+
+    public function markAsCanceled(Umrah $umrah): JsonResponse
+    {
+        if ($umrah->status === UmrahStatus::Cancelled) return $this->error("Umrah is already canceled.");
+        if ($umrah->status === UmrahStatus::Completed) return $this->error("Completed Umrah cannot be canceled.");
+
+
+        $umrah->status = UmrahStatus::Cancelled;
+        $umrah->save();
+
+        PilgrimLog::add(
+            $umrah->pilgrim,
+            $umrah->id,
+            Umrah::class,
+            PilgrimLogType::UmrahCancelled,
+            "উমরাহ বাতিল করা হয়েছে।"
+        );
+
+        return $this->success("Umrah marked as canceled successfully.");
+    }
+
+    public function markAsCompleted(Umrah $umrah): JsonResponse
+    {
+        if ($umrah->status === UmrahStatus::Completed) return $this->error("Umrah is already completed.");
+        if ($umrah->status === UmrahStatus::Cancelled) return $this->error("Canceled Umrah cannot be marked as completed.");
+
+        $umrah->status = UmrahStatus::Completed;
+        $umrah->save();
+
+        PilgrimLog::add(
+            $umrah->pilgrim,
+            $umrah->id,
+            Umrah::class,
+            PilgrimLogType::UmrahCompleted,
+            "উমরাহ সম্পন্ন হয়েছে।"
+        );
+
+        return $this->success("Umrah marked as completed successfully.");
+    }
+
+    public function restore(Umrah $umrah): JsonResponse
+    {
+        if ($umrah->status === UmrahStatus::Registered) return $this->error("Umrah is already active.");
+        if ($umrah->status === UmrahStatus::Completed) return $this->error("Completed Umrah cannot be restored to active status.");
+
+        $umrah->status = UmrahStatus::Registered;
+        $umrah->save();
+
+        PilgrimLog::add(
+            $umrah->pilgrim,
+            $umrah->id,
+            Umrah::class,
+            PilgrimLogType::UmrahRegistered,
+            "উমরাহর জন্য রেজিস্ট্রেশন (পুনরায়) করা হয়েছে।"
+        );
+
+        return $this->success("Umrah restored to active status successfully.");
     }
 
     public function destroy(Umrah $umrah): JsonResponse
