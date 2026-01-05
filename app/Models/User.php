@@ -64,6 +64,21 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Pilgrim::class);
     }
 
+    public function addresses(): MorphMany
+    {
+        return $this->morphMany(Address::class, 'addressable');
+    }
+
+    public function presentAddress(): MorphOne
+    {
+        return $this->morphOne(Address::class, 'addressable')->where('type', 'present');
+    }
+
+    public function permanentAddress(): MorphOne
+    {
+        return $this->morphOne(Address::class, 'addressable')->where('type', 'permanent');
+    }
+
     // Helpers
     public function fullName(): string
     {
