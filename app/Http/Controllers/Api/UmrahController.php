@@ -24,7 +24,6 @@ class UmrahController extends Controller
     public function index(): AnonymousResourceCollection
     {
         return UmrahResource::collection(Umrah::with([
-            // 'year',
             'groupLeader',
             'pilgrim.user.presentAddress',
             'pilgrim.user.permanentAddress',
@@ -728,4 +727,6 @@ class UmrahController extends Controller
 
         // return $this->success("Umrah deleted successfully.");
     }
+
+    // public function colloection()
 }

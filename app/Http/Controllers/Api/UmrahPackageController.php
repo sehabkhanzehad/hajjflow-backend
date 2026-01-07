@@ -14,7 +14,7 @@ class UmrahPackageController extends Controller
 {
     public function index(): AnonymousResourceCollection
     {
-        return PackageResource::collection(Package::umrah()->paginate(request()->get('per_page', 10)));
+        return PackageResource::collection(Package::umrah()->with('umrahs')->paginate(request()->get('per_page', 10)));
     }
 
     public function store(Request $request): JsonResponse
@@ -65,5 +65,24 @@ class UmrahPackageController extends Controller
         } catch (\Exception $e) {
             return $this->error('Failed to delete package: ' . $e->getMessage(), 500);
         }
+    }
+
+    public function show(Package $package): PackageResource
+    {
+        return new PackageResource($package->load('umrahs'));
+    }
+
+    public function pilgrims(Package $package): AnonymousResourceCollection
+    {
+        $perPage = request()->get('per_page', 10);
+        $umrahs = $package->umrahs()->with([
+            'groupLeader',
+            'pilgrim.user.presentAddress',
+            'pilgrim.user.permanentAddress',
+            'package',
+            'passports'
+        ])->latest()->paginate($perPage);
+
+        return \App\Http\Resources\Api\UmrahResource::collection($umrahs);
     }
 }

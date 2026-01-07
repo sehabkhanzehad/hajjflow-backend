@@ -114,7 +114,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [UmrahController::class, 'index']);
         Route::post('/', [UmrahController::class, 'store']);
         Route::get('/{umrah}', [UmrahController::class, 'show']);
-        // Route::put('/{umrah}', [UmrahController::class, 'update']);
         Route::delete('/{umrah}', [UmrahController::class, 'destroy']);
 
         // Pilgrim update routes
@@ -136,8 +135,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('umrah-packages')->group(function () {
         Route::get('/', [UmrahPackageController::class, 'index']);
         Route::post('/', [UmrahPackageController::class, 'store']);
+        Route::get('/{package}', [UmrahPackageController::class, 'show']);
         Route::put('/{package}', [UmrahPackageController::class, 'update']);
         Route::delete('/{package}', [UmrahPackageController::class, 'destroy']);
+        Route::get('/{package}/pilgrims', [UmrahPackageController::class, 'pilgrims']);
     });
 
     Route::prefix('sections')->group(function () {

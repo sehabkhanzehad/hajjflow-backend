@@ -15,6 +15,8 @@ class PackageResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $umrahs = $this->umrahs;
+
         return [
             'type' => 'package',
             'id' => $this->id,
@@ -29,6 +31,12 @@ class PackageResource extends JsonResource
                 'status' => $this->status,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,
+                'statistics' => [
+                    'total_pilgrims' => $umrahs->count(),
+                    'registered' => $umrahs->where('status', 'registered')->count(),
+                    'cancelled' => $umrahs->where('status', 'cancelled')->count(),
+                    'completed' => $umrahs->where('status', 'completed')->count(),
+                ],
             ],
             'relationships' => [
                 'year' => new YearResource($this->whenLoaded('year')),
