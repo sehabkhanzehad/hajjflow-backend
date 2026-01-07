@@ -109,9 +109,17 @@ class UmrahPackageController extends Controller
             'date' => ['required', 'date'],
         ]);
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $package) {
-            $umrahPilrim = $package->umrahs()->where('id', $request->umrah_id)->first();
-            $groupLeader = $umrahPilrim->groupLeader;
+        $umrahPilgrim = $package->umrahs()->where('id', $request->umrah_id)->first();
+        $contract = $umrahPilgrim->package->price - $umrahPilgrim->discount;
+        $totalPaid = $umrahPilgrim->totalPaid();
+        $dueAmount = max($contract - $totalPaid, 0);
+
+        if ($request->amount > $dueAmount) {
+            return $this->error('Collection amount exceeds due amount', 422);
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $umrahPilgrim) {
+            $groupLeader = $umrahPilgrim->groupLeader;
             $section = $groupLeader->section;
 
             $transaction = $section->transactions()->create([
@@ -127,7 +135,7 @@ class UmrahPackageController extends Controller
 
             $transaction->references()->create([
                 'referenceable_type' => Umrah::class,
-                'referenceable_id' => $umrahPilrim->id,
+                'referenceable_id' => $umrahPilgrim->id,
             ]);
         });
 

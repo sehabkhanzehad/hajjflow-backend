@@ -55,7 +55,7 @@ class Umrah extends Model
     {
         return Transaction::whereHas('references', function ($query) {
             $query->where('referenceable_id', $this->id)
-                  ->where('referenceable_type', self::class);
+                ->where('referenceable_type', self::class);
         })->where('type', 'income')->sum('amount');
     }
 
@@ -63,14 +63,13 @@ class Umrah extends Model
     {
         return Transaction::whereHas('references', function ($query) {
             $query->where('referenceable_id', $this->id)
-                  ->where('referenceable_type', self::class);
+                ->where('referenceable_type', self::class);
         })->where('type', 'expense')->sum('amount');
     }
 
     public function dueAmount(): float
     {
-        $totalPaid = $this->totalCollect() - $this->totalRefund();
-        $due = $this->package->price - ($totalPaid + $this->discount);
+        $due = $this->package->price - ($this->totalPaid() + $this->discount);
         return max($due, 0);
     }
 
