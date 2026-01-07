@@ -190,6 +190,8 @@ class UmrahController extends Controller
             'new_pilgrim.mother_name_bangla' => ['nullable', 'string'],
             'new_pilgrim.father_name' => ['nullable', 'string'],
             'new_pilgrim.father_name_bangla' => ['nullable', 'string'],
+            'new_pilgrim.occupation' => ['nullable', 'string'],
+            'new_pilgrim.spouse_name' => ['nullable', 'string'],
             'new_pilgrim.email' => ['nullable', 'email', 'unique:users,email'],
             'new_pilgrim.phone' => ['nullable', 'string'],
             'new_pilgrim.gender' => ['required_with:new_pilgrim', 'in:male,female,other'],
@@ -356,6 +358,8 @@ class UmrahController extends Controller
                     'mother_name_bangla' => $validated['new_pilgrim']['mother_name_bangla'] ?? null,
                     'father_name' => $validated['new_pilgrim']['father_name'] ?? null,
                     'father_name_bangla' => $validated['new_pilgrim']['father_name_bangla'] ?? null,
+                    'occupation' => $validated['new_pilgrim']['occupation'] ?? null,
+                    'spouse_name' => $validated['new_pilgrim']['spouse_name'] ?? null,
                     'email' => $validated['new_pilgrim']['email'] ?? null,
                     'phone' => $validated['new_pilgrim']['phone'] ?? null,
                     'gender' => $validated['new_pilgrim']['gender'],
@@ -591,6 +595,8 @@ class UmrahController extends Controller
             'father_name_bangla' => ['nullable', 'string'],
             'mother_name' => ['nullable', 'string'],
             'mother_name_bangla' => ['nullable', 'string'],
+            'occupation' => ['nullable', 'string'],
+            'spouse_name' => ['nullable', 'string'],
         ]);
 
         $user = $umrah->pilgrim->user;
@@ -605,6 +611,8 @@ class UmrahController extends Controller
             'father_name_bangla' => $validated['father_name_bangla'] ?? null,
             'mother_name' => $validated['mother_name'] ?? null,
             'mother_name_bangla' => $validated['mother_name_bangla'] ?? null,
+            'occupation' => $validated['occupation'] ?? null,
+            'spouse_name' => $validated['spouse_name'] ?? null,
         ]);
 
         return $this->success("Personal information updated successfully.");
