@@ -56,6 +56,7 @@ class PreRegistrationController extends Controller
                 'type' => 'pilgrim',
                 'id' => $user->pilgrim->id,
                 'attributes' => [
+                    'avatar' => $user->avatar,
                     'fullName' => $user->full_name,
                     'firstName' => $user->first_name,
                     'lastName' => $user->last_name,
