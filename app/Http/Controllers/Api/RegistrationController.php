@@ -160,6 +160,8 @@ class  RegistrationController extends Controller
             'date' => $request->date,
         ]);
 
+        $preRegistration->markAsRegistered();
+
         PilgrimLog::add(
             $registration->pilgrim,
             $registration->id,
