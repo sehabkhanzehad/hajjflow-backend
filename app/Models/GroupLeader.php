@@ -35,6 +35,18 @@ class GroupLeader extends Model
         return $this->hasMany(PreRegistration::class);
     }
 
+    public function registrations(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Registration::class,
+            PreRegistration::class,
+            'group_leader_id', // Foreign key on pre_registrations table
+            'pre_registration_id', // Foreign key on registrations table
+            'id', // Local key on group_leaders table
+            'id' // Local key on pre_registrations table
+        );
+    }
+
     public function pilgrims(): HasManyThrough
     {
         return $this->hasManyThrough(
