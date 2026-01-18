@@ -39,7 +39,9 @@ class TransactionController extends Controller
 
     public function sections(): AnonymousResourceCollection
     {
-        return SectionResource::collection(Section::whereNotIn('type', [SectionType::Bank, SectionType::GroupLeader])->orderBy('name')->get());
+        return SectionResource::collection(Section::whereIn('type', [
+            SectionType::Other,
+        ])->orderBy('name')->get());
     }
 
     public function loans(): AnonymousResourceCollection
