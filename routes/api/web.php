@@ -29,11 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('sections', [TransactionController::class, 'sections']);
         Route::get('pre-registrations', [TransactionController::class, 'preRegistrations']);
         Route::get('registrations', [TransactionController::class, 'registrations']);
-        Route::get('loans', [TransactionController::class, 'loans']);
 
         Route::get('/', [TransactionController::class, 'index']);
         Route::post('/', [TransactionController::class, 'store']);
-        Route::get('/{transaction}', [TransactionController::class, 'show']);
         Route::put('/{transaction}', [TransactionController::class, 'update']);
     });
 

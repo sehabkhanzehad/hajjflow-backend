@@ -6,18 +6,17 @@ use App\Enums\SectionType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\TransactionRequest;
 use App\Http\Resources\Api\GroupLeaderResource;
-use App\Http\Resources\Api\LoanResource;
 use App\Http\Resources\Api\PilgrimResource;
 use App\Http\Resources\Api\RegistrationResource;
 use App\Http\Resources\Api\SectionResource;
 use App\Http\Resources\Api\TransactionResource;
-use App\Models\Loan;
 use App\Models\PreRegistration;
 use App\Models\Registration;
 use App\Models\Section;
 use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
@@ -30,13 +29,6 @@ class TransactionController extends Controller
         );
     }
 
-    public function show(Transaction $transaction): TransactionResource
-    {
-        return new TransactionResource(
-            $transaction->load(['section', 'references.referenceable'])
-        );
-    }
-
     public function sections(): AnonymousResourceCollection
     {
         return SectionResource::collection(Section::whereIn('type', [
@@ -46,10 +38,6 @@ class TransactionController extends Controller
         ])->orderBy('name')->get());
     }
 
-    public function loans(): AnonymousResourceCollection
-    {
-        return LoanResource::collection(Loan::all());
-    }
 
     public function preRegistrations(): JsonResponse
     {
@@ -113,26 +101,19 @@ class TransactionController extends Controller
     //11-12-2025 | Md Abu Bakar Siddique | 0             |1000  | 1000,
     //12-12-2025 | Md Abu Bakar Siddique | 1000          |500   | 1500
 
-
-
-
-
-    public function update(TransactionRequest $request, Transaction $transaction): JsonResponse
+    public function update(Request $request, Transaction $transaction): JsonResponse
     {
-        $section = $request->section();
+        $request->validate([
+            'voucher_no' => ['nullable', 'string', 'max:100'],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+        ]);
 
         $transaction->update([
-            'type' => $request->type,
             'voucher_no' => $request->voucher_no,
             'title' => $request->title,
             'description' => $request->description,
-            'amount' => $request->amount,
-            'date' => $request->date,
         ]);
-
-        // Remove existing references and add new ones
-        $transaction->references()->delete();
-        $transaction->addReferences($request);
 
         return $this->success("Transaction updated successfully.");
     }
