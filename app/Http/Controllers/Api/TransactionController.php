@@ -124,9 +124,9 @@ class TransactionController extends Controller
         $currentBalance = Section::all()->sum(fn($section) => $section->currentBalance());
 
         $today = now()->toDateString();
-        $todayTransactionsCount = Transaction::whereDate('date', $today)->count();
-        $todayIncome = Transaction::whereDate('date', $today)->where('type', 'income')->sum('amount');
-        $todayExpense = Transaction::whereDate('date', $today)->where('type', 'expense')->sum('amount');
+        $todayTransactionsCount = Transaction::where('date', $today)->count();
+        $todayIncome = Transaction::where('date', $today)->where('type', 'income')->sum('amount');
+        $todayExpense = Transaction::where('date', $today)->where('type', 'expense')->sum('amount');
 
         // Additional metrics
         $averageTransactionAmount = Transaction::avg('amount') ?? 0;
