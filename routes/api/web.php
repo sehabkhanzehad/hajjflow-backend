@@ -18,22 +18,16 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     require __DIR__ . '/web/group-leaders.php';
+
     require __DIR__ . '/web/pre-registrations.php';
     require __DIR__ . '/web/registrations.php';
     require __DIR__ . '/web/hajj-packages.php';
+
     require __DIR__ . '/web/umrahs.php';
     require __DIR__ . '/web/umrah-packages.php';
+
     require __DIR__ . '/web/sections.php';
-
-    Route::prefix('transactions')->group(function () {
-        Route::get('sections', [TransactionController::class, 'sections']);
-        Route::get('pre-registrations', [TransactionController::class, 'preRegistrations']);
-        Route::get('registrations', [TransactionController::class, 'registrations']);
-
-        Route::get('/', [TransactionController::class, 'index']);
-        Route::post('/', [TransactionController::class, 'store']);
-        Route::put('/{transaction}', [TransactionController::class, 'update']);
-    });
+    require __DIR__ . '/web/transactions.php';
 
     // User profile routes
     Route::get('users', [UserController::class, 'index']);
