@@ -91,6 +91,15 @@ class Section extends Model
         return $this->lastTransaction?->after_balance ?? 0.0;
     }
 
+    public function currentMonthIncome(): float
+    {
+        return $this->transactions()
+            ->where('type', 'income')
+            ->whereMonth('date', now()->month)
+            ->whereYear('date', now()->year)
+            ->sum('amount');
+    }
+
     public function afterBalance(TransactionRequest $request): float
     {
         // if lend or expense then add

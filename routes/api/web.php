@@ -26,8 +26,14 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/web/umrahs.php';
     require __DIR__ . '/web/umrah-packages.php';
 
-    require __DIR__ . '/web/sections.php';
-    require __DIR__ . '/web/transactions.php';
+    // Accounts
+    Route::get('/accounts/overview', [TransactionController::class, 'overview']);
+    require __DIR__ . '/web/accounts/sections.php';
+    require __DIR__ . '/web/accounts/transactions.php';
+
+
+
+
 
     // User profile routes
     Route::get('users', [UserController::class, 'index']);

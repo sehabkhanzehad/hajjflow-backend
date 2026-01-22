@@ -23,8 +23,11 @@ class SectionResource extends JsonResource
                 'type' => $this->type,
                 'description' => $this->description,
                 'updatedAt' => $this->updated_at,
+                'total_deposit' => $this->transactions()->where('type', 'income')->whereMonth('date', now()->month)->whereYear('date', now()->year)->sum('amount'),
+                'total_withdraw' => $this->transactions()->where('type', 'expense')->whereMonth('date', now()->month)->whereYear('date', now()->year)->sum('amount'),
             ],
             'relationships' => [
+                'lastTransaction' => new TransactionResource($this->whenLoaded('lastTransaction')),
                 "bank" => new BankResource($this->whenLoaded('bank')),
                 "groupLeader" => new GroupLeaderResource($this->whenLoaded('groupLeader')),
                 "employee" => new EmployeeResource($this->whenLoaded('employee')),

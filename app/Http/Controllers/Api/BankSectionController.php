@@ -17,9 +17,13 @@ use Illuminate\Support\Facades\DB;
 
 class BankSectionController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return SectionResource::collection(Section::typeBank()->with('bank')->paginate(perPage()));
+        $query = Section::typeBank()->with('bank', 'lastTransaction')->latest();
+
+        if (!$request->boolean('paginate', true)) return SectionResource::collection($query->get());
+
+        return SectionResource::collection($query->paginate($request->integer('per_page', perPage())));
     }
 
     public function store(Request $request): JsonResponse
@@ -125,10 +129,7 @@ class BankSectionController extends Controller
         return $this->success("Bank section updated successfully.");
     }
 
-    public function bankSections(): AnonymousResourceCollection
-    {
-        return SectionResource::collection(Section::typeBank()->with('bank')->get());
-    }
+
 
     public function deposit(Request $request, Section $section): JsonResponse
     {
