@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\GroupLeaderResource;
 use App\Http\Resources\Api\PilgrimResource;
 use App\Http\Resources\Api\SectionResource;
+use App\Http\Resources\PackageResource;
 use App\Models\GroupLeader;
+use App\Models\Package;
 use App\Models\PreRegistration;
 use App\Models\Section;
+use App\Models\Umrah;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -53,6 +56,61 @@ class GroupLeaderController extends Controller
         return response()->json(['data' => $preRegistrations]);
     }
 
+    public function umrahPackages(): JsonResponse
+    {
+        $umrahs = Package::umrah()->with('umrahs.pilgrim.user')->get()->map(function ($package) {
+            return [
+                "type" => "package",
+                "id" => $package->id,
+                "attributes" => [
+                    "name" => $package->name,
+                    "startDate" => $package->start_date,
+                    "endDate" => $package->end_date,
+                    "price" => $package->price,
+                ],
+                "relationships" => [
+                    "umrahs" => $package->umrahs->map(function ($umrah) {
+                        return [
+                            'type' => 'umrah',
+                            'id' => $umrah->id,
+                            'attributes' => [
+                                'status' => $umrah->status,
+                            ],
+                            'relationships' => [
+                                'groupLeader' => [
+                                    'type' => 'group-leader',
+                                    'id' => $umrah->groupLeader->id,
+                                    'attributes' => [],
+                                ],
+                                'pilgrim' => [
+                                    'type' => 'pilgrim',
+                                    'id' => $umrah->pilgrim->id,
+                                    'attributes' => [
+                                        'createdAt' => $umrah->pilgrim->created_at,
+                                    ],
+                                    'relationships' => [
+                                        'user' => [
+                                            'type' => 'user',
+                                            'id' => $umrah->pilgrim->user->id,
+                                            'attributes' => [
+                                                'name' => $umrah->pilgrim->user->name,
+                                                'avatar' => $umrah->pilgrim->user->avatar,
+                                                'phone' => $umrah->pilgrim->user->phone,
+                                            ],
+                                        ]
+                                    ]
+                                ],
+                            ],
+                        ];
+                    }),
+                ],
+            ];
+        });
+
+        return response()->json(['data' => $umrahs]);
+    }
+
+
     public function collection(Request $request)
     {
         $request->validate([
@@ -63,6 +121,7 @@ class GroupLeaderController extends Controller
             'description' => ['nullable', 'string'],
             'amount' => ['required', 'numeric'],
             'date' => ['required', 'date'],
+            'pre_registration_id' => ['nullable', 'exists:pre_registrations,id'],
         ]);
 
         $section = Section::find($request->section_id);
@@ -94,6 +153,84 @@ class GroupLeaderController extends Controller
             $transaction->references()->create([
                 'referenceable_type' => PreRegistration::class,
                 'referenceable_id' => $request->pre_registration_id,
+            ]);
+        }
+
+        return $this->success('Transaction recorded successfully.', 201);
+    }
+
+    public function umrahCollection(Request $request)
+    {
+        $request->validate([
+            'section_id' => ['required', 'exists:sections,id'],
+            'type' => ['required', 'in:income,expense'],
+            "voucher_no" => ['required', 'string', 'max:100'],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'amount' => ['required', 'numeric'],
+            'date' => ['required', 'date'],
+            'package_id' => ['required', 'integer', 'exists:packages,id'],
+            'umrah_id' => ['nullable', 'integer', 'exists:umrahs,id'],
+        ]);
+
+        $section = Section::find($request->section_id);
+
+        if (!$section->isGroupLeader()) return $this->error("Invalid section for group leader transaction.");
+
+        $groupLeader = $section->groupLeader;
+
+        if ($groupLeader?->pilgrim_required) {
+            $request->validate([
+                'umrah_id' =>  ['required', 'exists:umrahs,id']
+            ]);
+        }
+
+        if ($request->umrah_id) {
+            $umrah = Umrah::find($request->umrah_id);
+            if ($umrah->groupLeader->id !== $groupLeader->id) {
+                return $this->error("The selected umrah does not belong to the group leader's pilgrim.");
+            }
+        }
+
+        if ($request->umrah_id && $umrah->package->id !==  (int) $request->package_id) {
+            return $this->error("The selected umrah does not belong to the specified package.");
+        }
+
+        if ($groupLeader->pilgrim_required) {
+            $contract = $umrah->package->price - $umrah->discount;
+            $totalPaid = $umrah->totalPaid();
+            $dueAmount = max($contract - $totalPaid, 0);
+            if ($request->type === 'income' && $request->amount > $dueAmount) {
+                return $this->error("Collection amount exceeds due amount of {$dueAmount}.", 422);
+            }
+
+            if ($request->type === 'expense' && $request->amount > $totalPaid) {
+                return $this->error("Refund amount exceeds total paid amount of {$totalPaid}.", 422);
+            }
+        }
+
+        $transaction = $section->transactions()->create([
+            'type' => $request->type,
+            'voucher_no' => $request->voucher_no,
+            'title' => $request->title,
+            'description' => $request->description,
+            'before_balance' => $section->currentBalance(),
+            'amount' => $request->amount,
+            'after_balance' => $request->type === 'income'
+                ? $section->currentBalance() + $request->amount
+                : $section->currentBalance() - $request->amount,
+            'date' => $request->date,
+        ]);
+
+        $transaction->references()->create([
+            'referenceable_type' => Package::class,
+            'referenceable_id' => $request->package_id,
+        ]);
+
+        if ($request->umrah_id) {
+            $transaction->references()->create([
+                'referenceable_type' => Umrah::class,
+                'referenceable_id' => $request->umrah_id,
             ]);
         }
 

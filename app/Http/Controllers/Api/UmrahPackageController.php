@@ -118,8 +118,12 @@ class UmrahPackageController extends Controller
         $totalPaid = $umrahPilgrim->totalPaid();
         $dueAmount = max($contract - $totalPaid, 0);
 
-        if ($request->amount > $dueAmount) {
+        if ($request->type === 'income' && $request->amount > $dueAmount) {
             return $this->error('Collection amount exceeds due amount', 422);
+        }
+
+        if ($request->type === 'expense' && $request->amount > $totalPaid) {
+            return $this->error('Refund amount exceeds total paid amount', 422);
         }
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($request, $umrahPilgrim) {

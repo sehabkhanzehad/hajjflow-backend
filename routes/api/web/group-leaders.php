@@ -9,4 +9,7 @@ Route::prefix('group-leaders')->group(function () {
     Route::get('/sections', [GroupLeaderController::class, 'sections']);
     Route::get('/pre-registrations', [GroupLeaderController::class, 'preRegistrations']);
     Route::post('/collection', [GroupLeaderController::class, 'collection']);
+
+    Route::get('/umrah-packages', [GroupLeaderController::class, 'umrahPackages']);
+    Route::post('/umrah-collection', [GroupLeaderController::class, 'umrahCollection']);
 });
