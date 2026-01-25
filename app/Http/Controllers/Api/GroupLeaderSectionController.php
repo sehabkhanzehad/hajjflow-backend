@@ -91,7 +91,7 @@ class GroupLeaderSectionController extends Controller
             "phone" => ["nullable", "string", "max:20"],
             "gender" => ["required", "in:male,female,other"],
             'date_of_birth' => ['nullable', 'date'],
-            'pilgrim_required' => ['required', 'boolean'],
+            'track_payment' => ['required', 'boolean'],
             'status' => ['required', 'boolean']
         ]);
 
@@ -117,7 +117,7 @@ class GroupLeaderSectionController extends Controller
 
             $section->groupLeader->update([
                 "group_name" => $request->group_name,
-                'pilgrim_required' => $request->pilgrim_required,
+                'pilgrim_required' => $request->track_payment,
                 'status' => $request->status,
             ]);
         });
