@@ -110,7 +110,6 @@ class GroupLeaderController extends Controller
         return response()->json(['data' => $umrahs]);
     }
 
-
     public function collection(Request $request)
     {
         $request->validate([

@@ -6,13 +6,21 @@ use App\Http\Controllers\Api\EmployeeSectionController;
 use App\Http\Controllers\Api\GroupLeaderSectionController;
 use App\Http\Controllers\Api\LendingSectionController;
 use App\Http\Controllers\Api\SectionController;
+use App\Http\Controllers\Api\Web\Accounts\UmrahSectionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('sections')->group(function () {
 
     require __DIR__ . '/sections/banks.php';
 
-
+    Route::prefix('umrahs')->group(function () {
+        Route::prefix('expenses')->group(function () {
+            Route::get('/', [UmrahSectionController::class, 'index']);
+            Route::post('/', [UmrahSectionController::class, 'store']);
+            Route::get('/packages', [UmrahSectionController::class, 'packages']);
+            Route::get('/group-leaders', [UmrahSectionController::class, 'groupLeaders']);
+        });
+    });
 
     Route::prefix('group-leaders')->group(function () {
         Route::get('/', [GroupLeaderSectionController::class, 'index']);

@@ -106,6 +106,6 @@ class EmployeeSectionController extends Controller
 
     public function transactions(Section $section): AnonymousResourceCollection
     {
-        return TransactionResource::collection($section->transactions()->latest()->paginate(10));
+        return TransactionResource::collection($section->transactions()->latest()->paginate(perPage()));
     }
 }

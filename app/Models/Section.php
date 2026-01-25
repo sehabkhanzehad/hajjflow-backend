@@ -80,6 +80,11 @@ class Section extends Model
         return $query->whereType(SectionType::Borrow);
     }
 
+    public function scopeTypeUmrahCost($query)
+    {
+        return $query->whereType(SectionType::UmrahCost);
+    }
+
     public function scopeTypeOther($query)
     {
         return $query->whereIn('type', [SectionType::Other]);

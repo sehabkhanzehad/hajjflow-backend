@@ -12,5 +12,6 @@ enum SectionType: string
     case Borrow = 'borrow';
     case PreRegistration = 'pre_registration';
     case Registration = 'registration';
+    case UmrahCost = 'umrah_cost';
     case Other = 'other';
 }
