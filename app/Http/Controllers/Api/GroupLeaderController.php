@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\PilgrimLogType;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\GroupLeaderResource;
 use App\Http\Resources\Api\PilgrimResource;
@@ -9,6 +10,7 @@ use App\Http\Resources\Api\SectionResource;
 use App\Http\Resources\PackageResource;
 use App\Models\GroupLeader;
 use App\Models\Package;
+use App\Models\PilgrimLog;
 use App\Models\PreRegistration;
 use App\Models\Section;
 use App\Models\Umrah;
@@ -153,6 +155,16 @@ class GroupLeaderController extends Controller
                 'referenceable_type' => PreRegistration::class,
                 'referenceable_id' => $request->pre_registration_id,
             ]);
+
+            $preRegistration = PreRegistration::find($request->pre_registration_id);
+
+            PilgrimLog::add(
+                $preRegistration->pilgrim,
+                $preRegistration->id,
+                PreRegistration::class,
+                PilgrimLogType::HajjCollection,
+                "Hajj collection has been recorded."
+            );
         }
 
         return $this->success('Transaction recorded successfully.', 201);
@@ -208,30 +220,40 @@ class GroupLeaderController extends Controller
             }
         }
 
-        $transaction = $section->transactions()->create([
-            'type' => $request->type,
-            'voucher_no' => $request->voucher_no,
-            'title' => $request->title,
-            'description' => $request->description,
-            'before_balance' => $section->currentBalance(),
-            'amount' => $request->amount,
-            'after_balance' => $request->type === 'income'
-                ? $section->currentBalance() + $request->amount
-                : $section->currentBalance() - $request->amount,
-            'date' => $request->date,
-        ]);
-
-        $transaction->references()->create([
-            'referenceable_type' => Package::class,
-            'referenceable_id' => $request->package_id,
-        ]);
-
-        if ($request->umrah_id) {
-            $transaction->references()->create([
-                'referenceable_type' => Umrah::class,
-                'referenceable_id' => $request->umrah_id,
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $section, $umrah) {
+            $transaction = $section->transactions()->create([
+                'type' => $request->type,
+                'voucher_no' => $request->voucher_no,
+                'title' => $request->title,
+                'description' => $request->description,
+                'before_balance' => $section->currentBalance(),
+                'amount' => $request->amount,
+                'after_balance' => $request->type === 'income'
+                    ? $section->currentBalance() + $request->amount
+                    : $section->currentBalance() - $request->amount,
+                'date' => $request->date,
             ]);
-        }
+
+            $transaction->references()->create([
+                'referenceable_type' => Package::class,
+                'referenceable_id' => $request->package_id,
+            ]);
+
+            if ($request->umrah_id) {
+                $transaction->references()->create([
+                    'referenceable_type' => Umrah::class,
+                    'referenceable_id' => $request->umrah_id,
+                ]);
+
+                PilgrimLog::add(
+                    $umrah->pilgrim,
+                    $umrah->id,
+                    Umrah::class,
+                    PilgrimLogType::UmrahCollection,
+                    "Umrah collection has been recorded."
+                );
+            }
+        });
 
         return $this->success('Transaction recorded successfully.', 201);
     }

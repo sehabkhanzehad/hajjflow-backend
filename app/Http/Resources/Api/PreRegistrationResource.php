@@ -24,6 +24,7 @@ class PreRegistrationResource extends JsonResource
                 "voucherName" => $this->voucher_name,
                 "date" => $this->date,
                 "status" => $this->status,
+                "hasReplacement" => $this->hasReplacement(),
                 "archiveDate" => $this->archive_date,
                 "createdAt" => $this->created_at,
                 "updatedAt" => $this->updated_at,

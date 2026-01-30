@@ -447,7 +447,7 @@ class PreRegistrationController extends Controller
     public function updatePassport(Request $request, Passport $passport): JsonResponse
     {
         $validated = $request->validate([
-            'passport_number' => ['required', 'string', 'unique:passports,passport_number,' . $passport->id],
+            'passport_number' => ['required', 'string', "unique:passports,passport_number,{$passport->id}"],
             'issue_date' => ['required', 'date'],
             'expiry_date' => ['required', 'date', 'after:issue_date'],
             'passport_type' => ['required', 'in:ordinary,official,diplomatic'],
@@ -464,10 +464,10 @@ class PreRegistrationController extends Controller
         }
 
         $passport->passport_number = $validated['passport_number'];
-        $passport->issue_date = $validated['issue_date'];
-        $passport->expiry_date = $validated['expiry_date'];
-        $passport->passport_type = $validated['passport_type'];
-        $passport->notes = $validated['notes'] ?? null;
+        $passport->issue_date      = $validated['issue_date'];
+        $passport->expiry_date     = $validated['expiry_date'];
+        $passport->passport_type   = $validated['passport_type'];
+        $passport->notes           = $validated['notes'] ?? null;
         $passport->save();
 
         return $this->success("Passport updated successfully.");

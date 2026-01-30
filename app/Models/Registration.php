@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\RegistrationStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Registration extends Model
 {
@@ -16,6 +17,7 @@ class Registration extends Model
 
     protected $guarded = ['id'];
 
+    // Relations
     public function year(): BelongsTo
     {
         return $this->belongsTo(Year::class);
@@ -41,6 +43,22 @@ class Registration extends Model
         return $this->belongsTo(Bank::class);
     }
 
+    public function replace(): HasOne
+    {
+        return $this->hasOne(Replace::class);
+    }
+
+    // Helpers
+    public function isActive(): bool
+    {
+        return $this->status === RegistrationStatus::Active;
+    }
+
+    public function hasReplace(): bool
+    {
+        return $this->replace()->exists();
+    }
+
     // scopes
     public function scopeCurrentYear($query)
     {
@@ -50,7 +68,7 @@ class Registration extends Model
         return $query;
     }
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::creating(function (Registration $model) {
             $model->year_id = Year::getCurrentYear()?->id;

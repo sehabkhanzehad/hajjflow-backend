@@ -22,6 +22,7 @@ class RegistrationResource extends JsonResource
             "attributes" => [
                 "date" => $this->date,
                 "status" => $this->status,
+                "hasReplace" => $this->hasReplace(),
                 "createdAt" => $this->created_at,
                 "updatedAt" => $this->updated_at,
             ],

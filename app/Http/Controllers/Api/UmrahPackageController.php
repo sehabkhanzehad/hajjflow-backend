@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\PackageType;
+use App\Enums\PilgrimLogType;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PackageResource;
 use App\Models\Package;
+use App\Models\PilgrimLog;
 use App\Models\Umrah;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -145,6 +147,14 @@ class UmrahPackageController extends Controller
                 'referenceable_type' => Umrah::class,
                 'referenceable_id' => $umrahPilgrim->id,
             ]);
+
+            PilgrimLog::add(
+                $umrahPilgrim->pilgrim,
+                $umrahPilgrim->id,
+                Umrah::class,
+                PilgrimLogType::UmrahCollection,
+                "Umrah collection has been recorded."
+            );
         });
 
         return $this->success('Collection recorded successfully', 201);

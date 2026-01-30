@@ -36,6 +36,16 @@ class PreRegistration extends Model
         return $this->hasOne(Registration::class);
     }
 
+    public function replaceOld(): HasOne
+    {
+        return $this->hasOne(Replace::class, 'old_pre_registration_id');
+    }
+
+    public function replaceNew(): HasOne
+    {
+        return $this->hasOne(Replace::class, 'new_pre_registration_id');
+    }
+
     // Scopes
     public function scopeActive($query)
     {
@@ -47,14 +57,32 @@ class PreRegistration extends Model
     {
         return $this->status === PreRegistrationStatus::Active;
     }
+
     public function isPending(): bool
     {
         return $this->status === PreRegistrationStatus::Pending;
+    }
+
+    public function isRegistered(): bool
+    {
+        return $this->status === PreRegistrationStatus::Registered && $this->registration()->exists();
+    }
+
+    public function markAsCancelled($date = null): void
+    {
+        $this->status = PreRegistrationStatus::Cancelled;
+        $this->cancel_date = $date ?? now();
+        $this->save();
     }
 
     public function markAsRegistered(): void
     {
         $this->status = PreRegistrationStatus::Registered;
         $this->save();
+    }
+
+    public function hasReplacement(): bool
+    {
+        return $this->replaceOld()->exists();
     }
 }

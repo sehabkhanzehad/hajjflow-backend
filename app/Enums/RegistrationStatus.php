@@ -8,7 +8,5 @@ enum RegistrationStatus: string
 {
     use EnumHelper;
     case Active = 'active';
-    case Cancelled = 'cancelled';
     case Completed = 'completed';
-    case Transferred = 'transferred';
 }

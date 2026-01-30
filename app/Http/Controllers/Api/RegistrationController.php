@@ -3,22 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\PilgrimLogType;
-use App\Enums\RegistrationStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\GroupLeaderResource;
 use App\Http\Resources\Api\PassportResource;
 use App\Http\Resources\Api\PilgrimResource;
 use App\Http\Resources\Api\PreRegistrationResource;
 use App\Models\Bank;
-use App\Models\GroupLeader;
 use App\Models\Package;
 use App\Models\Passport;
 use App\Models\PilgrimLog;
 use App\Models\PreRegistration;
 use App\Models\Registration;
+use App\Models\Replace;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 
 class  RegistrationController extends Controller
 {
@@ -35,6 +34,7 @@ class  RegistrationController extends Controller
                     'registration.package',
                     'registration.bank',
                     'registration.preRegistration',
+                    'registration.replace'
                 ])->latest()->paginate(perPage())
         );
     }
@@ -97,8 +97,12 @@ class  RegistrationController extends Controller
             "package_id" => ["required", "integer", "exists:packages,id"],
             "bank_id" => ["required", "integer", "exists:banks,id"],
             "date" => ['required', 'date'],
+        ]);
 
-            "passport_number" => ['required', 'string', 'max:100'],
+        $preRegistration = PreRegistration::findOrFail($request->pre_registration_id);
+
+        $request->validate([
+            "passport_number" => ['required', 'string', 'unique:passports,passport_number,' . $preRegistration->passport()?->id, 'max:100'],
             "passport_type" => ['required', 'in:ordinary,official,diplomatic'],
             "issue_date" => ['required', 'date'],
             "expiry_date" => ['required', 'date', 'after:issue_date'],
@@ -106,11 +110,7 @@ class  RegistrationController extends Controller
             'passport_notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
-
-        $preRegistration = PreRegistration::findOrFail($request->pre_registration_id);
-
         if (!$preRegistration->isActive()) return $this->error("This pre-registration is not active.", 409);
-
 
         if (Registration::where('pre_registration_id', $preRegistration->id)->exists()) {
             return $this->error("This pre-registration has already been registered for the current year.", 409);
@@ -186,9 +186,9 @@ class  RegistrationController extends Controller
         ]);
 
         $registration->update([
-            'pre_registration_id' => $request->pre_registration_id,
+            // 'pre_registration_id' => $request->pre_registration_id,
             'package_id' => $request->package_id,
-            'bank_id' => $request->bank_id,
+            // 'bank_id' => $request->bank_id,
             'date' => $request->date,
         ]);
 
@@ -200,5 +200,103 @@ class  RegistrationController extends Controller
         return $this->error("Registration deletion is disabled temporarily.", 403);
         $registration->delete();
         return $this->success("Registration deleted successfully.");
+    }
+
+    public function replace(Request $request, Registration $registration): JsonResponse
+    {
+        $validated1 = $request->validate([
+            "pre_registration_id" => ["required", "integer", "exists:pre_registrations,id"],
+            "date" => ['required', 'date'],
+            "note" => ["nullable", "string", "max:1000"],
+        ]);
+
+        $newPreRegistration = PreRegistration::findOrFail($request->pre_registration_id);
+
+        $validated2 =  $request->validate([
+            "passport_number" => ['required', 'string', 'unique:passports,passport_number,' . $newPreRegistration->passport()?->id, 'max:100'],
+            "passport_type" => ['required', 'in:ordinary,official,diplomatic'],
+            "issue_date" => ['required', 'date'],
+            "expiry_date" => ['required', 'date', 'after:issue_date'],
+            "passport_file" => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+            'passport_notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $validated = array_merge($validated1, $validated2);
+
+
+        if (!$newPreRegistration->isActive()) return $this->error("The selected pre-registration is not active.", 409);
+
+        if ($newPreRegistration->isRegistered()) return $this->error("The selected pre-registration has already been registered.", 409);
+
+        if (!$registration->isActive()) return $this->error("Only active registrations can be replaced.", 409);
+
+        DB::transaction(function () use ($registration, $newPreRegistration, $request, $validated) {
+            Replace::create([
+                'registration_id' => $registration->id,
+                'old_pre_registration_id' => $registration->pre_registration_id,
+                'new_pre_registration_id' => $newPreRegistration->id,
+                'replace_date' => $request->date,
+                'note' => $request->note ?? null,
+            ]);
+
+            $oldPreRegistration = $registration->preRegistration;
+
+            $oldPreRegistration->markAsCancelled($request->date);
+            $newPreRegistration->markAsRegistered();
+
+            $registration->update([
+                'pre_registration_id' => $newPreRegistration->id,
+            ]);
+
+            if ($newPreRegistration->hasPassport()) {
+                $passport = $newPreRegistration->passport();
+
+                if ($request->has('passport_file')) {
+                    $passport->deleteFile();
+
+                    $passport->file_path = $request->hasFile('passport_file')
+                        ? $request->file('passport_file')->storeAs('passports', $validated['passport_number'] . '.' . $request->file('passport_file')->getClientOriginalExtension())
+                        : null;
+                }
+
+                $passport->passport_number = $validated['passport_number'];
+                $passport->passport_type = $validated['passport_type'];
+                $passport->issue_date = $validated['issue_date'];
+                $passport->expiry_date = $validated['expiry_date'];
+                $passport->notes = $validated['passport_notes'] ?? null;
+                $passport->save();
+            } else {
+                if ($request->hasFile('passport_file')) {
+                    $file = $request->file('passport_file');
+                    $passportNumber = $validated['passport_number'];
+                    $extension = $file->getClientOriginalExtension();
+                    $fileName = "$passportNumber.$extension";
+                    $filePath = $file->storeAs('passports', $fileName);
+                    $validated['file_path'] = $filePath;
+                }
+
+                $passport = Passport::create([
+                    'passport_number' => $validated['passport_number'],
+                    'passport_type' => $validated['passport_type'],
+                    'issue_date' => $validated['issue_date'],
+                    'expiry_date' => $validated['expiry_date'],
+                    'file_path' => $validated['file_path'] ?? null,
+                    'notes' => $validated['passport_notes'] ?? null,
+                    'pilgrim_id' => $newPreRegistration->pilgrim_id,
+                ]);
+
+                $newPreRegistration->assignPassport($passport);
+            }
+
+            PilgrimLog::add(
+                $registration->pilgrim,
+                $registration->id,
+                Registration::class,
+                PilgrimLogType::HajjRegReplaced,
+                "Hajj registration has been replaced."
+            );
+        });
+
+        return $this->success("Pre-registration replaced successfully.");
     }
 }

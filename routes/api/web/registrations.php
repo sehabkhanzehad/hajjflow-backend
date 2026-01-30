@@ -11,4 +11,5 @@ Route::prefix('registrations')->group(function () {
     Route::post('/', [RegistrationController::class, 'store']);
     Route::put('/{registration}', [RegistrationController::class, 'update']);
     Route::delete('/{registration}', [RegistrationController::class, 'destroy']);
+    Route::post('/{registration}/replace', [RegistrationController::class, 'replace']);
 });
