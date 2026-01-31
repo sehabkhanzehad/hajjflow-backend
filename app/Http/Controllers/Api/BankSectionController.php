@@ -23,7 +23,7 @@ class BankSectionController extends Controller
 
         if (!$request->boolean('paginate', true)) return SectionResource::collection($query->get());
 
-        return SectionResource::collection($query->paginate($request->integer('per_page', perPage())));
+        return SectionResource::collection($query->orderBy('code')->paginate($request->integer('per_page', perPage())));
     }
 
     public function store(Request $request): JsonResponse
