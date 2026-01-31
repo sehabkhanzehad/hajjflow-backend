@@ -69,7 +69,7 @@ class Registration extends Model
     public function restoreToPreRegistration(): bool //!Note: Only for tinker
     {
         $this->preRegistration->markAsActive();
-        // $this->logs()->where('type', PilgrimLogType::HajjRegistered)->delete();
+        $this->logs()->where('type', PilgrimLogType::HajjRegistered)->delete();
         return $this->delete();
     }
 
