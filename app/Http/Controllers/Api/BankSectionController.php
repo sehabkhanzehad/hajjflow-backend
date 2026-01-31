@@ -19,7 +19,7 @@ class BankSectionController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $query = Section::typeBank()->with('bank', 'lastTransaction')->latest();
+        $query = Section::typeBank()->with('bank', 'lastTransaction');
 
         if (!$request->boolean('paginate', true)) return SectionResource::collection($query->get());
 
