@@ -15,7 +15,7 @@ class BillSectionController extends Controller
 {
     public function index(): AnonymousResourceCollection
     {
-        return SectionResource::collection(Section::typeBill()->with('bill')->paginate(perPage()));
+        return SectionResource::collection(Section::typeBill()->with('bill')->orderBy('code')->paginate(perPage()));
     }
 
     public function store(Request $request): JsonResponse
