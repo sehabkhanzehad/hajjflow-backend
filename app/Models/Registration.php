@@ -51,7 +51,7 @@ class Registration extends Model
 
     public function logs(): MorphMany
     {
-        return $this->morphMany(PilgrimLog::class, 'reference');
+        return $this->morphMany(PilgrimLog::class, 'reference', 'reference_type', 'reference_id');
     }
 
     // Helpers
