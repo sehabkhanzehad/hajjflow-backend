@@ -19,11 +19,11 @@ class BankSectionController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $query = Section::typeBank()->with('bank', 'lastTransaction');
+        $query = Section::typeBank()->with('bank', 'lastTransaction')->orderBy('code');
 
         if (!$request->boolean('paginate', true)) return SectionResource::collection($query->get());
 
-        return SectionResource::collection($query->orderBy('code')->paginate($request->integer('per_page', perPage())));
+        return SectionResource::collection($query->paginate($request->integer('per_page', perPage())));
     }
 
     public function store(Request $request): JsonResponse
