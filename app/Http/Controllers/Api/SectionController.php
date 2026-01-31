@@ -17,7 +17,7 @@ class SectionController extends Controller
 
     public function index(): AnonymousResourceCollection
     {
-        return SectionResource::collection(Section::typeOther()->paginate(perPage()));
+        return SectionResource::collection(Section::typeOther()->orderBy('code')->paginate(perPage()));
     }
 
     public function store(Request $request): JsonResponse

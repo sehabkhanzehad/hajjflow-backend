@@ -16,7 +16,7 @@ class EmployeeSectionController extends Controller
 {
     public function index(): AnonymousResourceCollection
     {
-        return SectionResource::collection(Section::typeEmployee()->with('employee.user')->paginate(perPage()));
+        return SectionResource::collection(Section::typeEmployee()->with('employee.user')->orderBy('code')->paginate(perPage()));
     }
 
     public function store(Request $request): JsonResponse
