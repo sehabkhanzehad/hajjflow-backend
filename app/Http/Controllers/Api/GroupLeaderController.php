@@ -20,16 +20,32 @@ use Illuminate\Http\JsonResponse;
 
 class GroupLeaderController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return GroupLeaderResource::collection(
-            GroupLeader::with([
-                'user',
-            ])->withCount([
-                'activePreRegistrations as active_pre_registrations_count',
-                'registrations'
-            ])->paginate(perPage())
-        );
+        $query = GroupLeader::with([
+            'user',
+            'section'
+        ])->withCount([
+            'activePreRegistrations as active_pre_registrations_count',
+            'registrations'
+        ]);
+
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('group_name', 'like', "%$search%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('full_name', 'like', "%$search%")
+                            ->orWhere('full_name_bangla', 'like', "%$search%")
+                            ->orWhere('phone', 'like', "%$search%");
+                    })
+                    ->orWhereHas('section', function ($sectionQuery) use ($search) {
+                        $sectionQuery->where('name', 'like', "%$search%");
+                    });
+            });
+        }
+
+        return GroupLeaderResource::collection($query->paginate(perPage()));
     }
 
     public function sections(): AnonymousResourceCollection
