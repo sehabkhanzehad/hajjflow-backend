@@ -5,20 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 use App\Http\Resources\Api\CurrentUserResource;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
-    {
-        return CurrentUserResource::collection(User::paginate($request->get('per_page', 50)));
-    }
-
     public function show(Request $request): CurrentUserResource
     {
         return CurrentUserResource::make($request->user());
@@ -43,7 +36,6 @@ class UserController extends Controller
                 : null;
         }
 
-        // Update user fields
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
         $user->email = $request->email;
