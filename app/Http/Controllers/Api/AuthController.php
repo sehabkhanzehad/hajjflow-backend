@@ -10,6 +10,14 @@ use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
+
+    public function signUp(Request $request): JsonResponse
+    {
+
+        // Sign up logic here (not provided in the original snippets)
+        return $this->success("Sign up successful.");
+    }
+
     public function signIn(SignInRequest $request): JsonResponse
     {
         if (!$request->authenticate()) return $this->error('Invalid credentials.', 401);

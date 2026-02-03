@@ -35,6 +35,11 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     // Relationships
+    public function agency(): HasOne
+    {
+        return $this->hasOne(Agency::class);
+    }
+
     public function borrow(): MorphOne // Raj Travels took money
     {
         return $this->morphOne(Loan::class, 'loanable')->where('direction', 'borrow');
