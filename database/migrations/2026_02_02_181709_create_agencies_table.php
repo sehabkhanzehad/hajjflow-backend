@@ -12,9 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('agencies', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->uuid('id')->primary();
+            $table->foreignId('customer_id')->constrained()->cascadeOnDelete();
             $table->string('name');
+            $table->string('bangla_name')->nullable();
+            $table->string('arabic_name')->nullable();
             $table->string('license')->nullable();
             $table->string('logo')->nullable();
             $table->string('address')->nullable();

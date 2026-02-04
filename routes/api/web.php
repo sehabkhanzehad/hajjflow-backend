@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 require __DIR__ . '/web/auth.php';
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:customer-api')->group(function () {
     // Management
     Route::prefix('analytics')->group(function () {
         Route::get('dashboard', [AnalyticsController::class, 'dashboard']);

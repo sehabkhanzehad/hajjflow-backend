@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Web\Customer\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\SignInRequest;
+use App\Http\Requests\Api\Web\Customer\Auth\SignInRequest;
 use App\Http\Resources\Api\CurrentUserResource;
+use App\Http\Resources\Api\CustomerResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
-
     public function signUp(Request $request): JsonResponse
     {
 

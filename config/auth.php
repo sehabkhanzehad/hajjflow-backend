@@ -40,6 +40,30 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        // 'customer-web' => [
+        //     'driver' => 'session',
+        //     'provider' => 'customers',
+        // ],
+
+        // 'admin-web' => [
+        //     'driver' => 'session',
+        //     'provider' => 'admins',
+        // ],
+        // API (Sanctum)
+        'user-api' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+
+        'customer-api' => [
+            'driver' => 'sanctum',
+            'provider' => 'customers',
+        ],
+
+        // 'admin-api' => [
+        //     'driver' => 'sanctum',
+        //     'provider' => 'admins',
+        // ],
     ],
 
     /*
@@ -64,6 +88,14 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
+        'customers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Customer::class,
+        ],
+        // 'admins' => [
+        //     'driver' => 'eloquent',
+        //     'model' => App\Models\Admin::class,
+        // ],
 
         // 'users' => [
         //     'driver' => 'database',

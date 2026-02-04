@@ -7,8 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\Api\CurrentUserResource;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -20,8 +18,7 @@ class UserController extends Controller
     public function update(Request $request): JsonResponse
     {
         $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['nullable', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $request->user()->id],
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ]);
@@ -36,12 +33,15 @@ class UserController extends Controller
                 : null;
         }
 
-        $user->first_name = $request->first_name;
-        $user->last_name = $request->last_name;
+        $user->name = $request->name;
         $user->email = $request->email;
         $user->save();
 
-        return $this->success("Profile updated successfully", 200, ['user' => new CurrentUserResource($user)]);
+        return $this->success(
+            "Profile updated successfully",
+            200,
+            ['user' => new CurrentUserResource($user)]
+        );
     }
 
     public function changePassword(Request $request): JsonResponse

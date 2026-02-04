@@ -2,21 +2,34 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Agency extends Model
 {
+    use HasUuids;
+
     protected $fillable = [
-        'user_id',
+        'customer_id',
         'name',
+        'bangla_name',
+        'arabic_name',
+        'license',
+        'logo',
         'address',
         'phone',
         'email',
     ];
 
-    public function user(): BelongsTo
+    public function customer(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function teamMembers(): HasMany
+    {
+        return $this->hasMany(Customer::class, 'agency_id', 'id');
     }
 }
