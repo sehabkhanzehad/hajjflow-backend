@@ -1,17 +1,4 @@
 // -[] prevent duplicate entry for user with followiing doc
 
-
-
-
-
-
-// After deployed
-// -[] Add agency id to the groups table and its section table
-// -[] remove nullabe from agency id from every table that added with nullable
-
-
-
-
-
 // -[] Need to update the group leader update method and its frontend part
-// -[] Need to update the group leader store frontend just 
+// -[] Need to update the group leader store frontend just

@@ -1,52 +1,262 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# HajjFlow Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php)](https://php.net)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql)](https://mysql.com)
+[![AWS S3](https://img.shields.io/badge/AWS%20S3-Storage-FF9900?style=for-the-badge&logo=amazon-s3)](https://aws.amazon.com/s3/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
-## About Laravel
+A comprehensive **SaaS platform** for Hajj and Umrah pilgrimage management, built with modern technologies to streamline operations for travel agencies and pilgrimage organizers.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🌟 Overview
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+HajjFlow is an enterprise-grade SaaS solution designed to digitize and automate the entire Hajj and Umrah pilgrimage management process. From initial customer registration to post-pilgrimage accounting, HajjFlow provides agencies with powerful tools to manage their operations efficiently and compliantly.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Key Features
 
-## Learning Laravel
+- **🏢 Multi-Agency Support**: Complete isolation between agencies with secure data management
+- **👥 Pilgrim Management**: Comprehensive pilgrim registration, tracking, and documentation
+- **👨‍💼 Group Leader Management**: Assign and manage group leaders for organized pilgrimages
+- **📦 Package Management**: Create and manage Hajj/Umrah packages with pricing and itineraries
+- **💰 Financial Management**: Complete accounting system with transactions, bills, and reporting
+- **📊 Analytics Dashboard**: Real-time insights and performance metrics
+- **🌐 Multi-Language Support**: English, Bangla, and Arabic language support
+- **📱 RESTful API**: Modern API architecture for seamless integrations
+- **🔒 Enterprise Security**: Laravel Sanctum authentication with role-based access control
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🏗️ Architecture
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Tech Stack
 
-## Laravel Sponsors
+**Backend:**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **Framework**: Laravel 12.x (PHP 8.2+)
+- **Database**: MySQL 8.0+
+- **Authentication**: Laravel Sanctum
+- **File Storage**: AWS S3
+- **Monitoring**: Laravel Telescope
+- **Testing**: Pest PHP
+- **Code Quality**: Laravel Pint
 
-### Premium Partners
+**Frontend:**
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+- **Framework**: React 19 with Vite
+- **Styling**: Tailwind CSS with Radix UI components
+- **State Management**: TanStack Query
+- **Forms**: React Hook Form with Zod validation
+- **Internationalization**: i18next
+- **Charts**: Recharts
 
-## Contributing
+### System Architecture
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   React SPA     │    │   Laravel API   │    │     MySQL DB    │
+│                 │◄──►│                 │◄──►│                 │
+│ • Dashboard     │    │ • REST API      │    │ • Agencies      │
+│ • Pilgrim Mgmt  │    │ • Authentication │    │ • Pilgrims      │
+│ • Analytics     │    │ • Business Logic │    │ • Transactions  │
+│ • Reports       │    │ • File Upload    │    │ • Packages      │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                              │
+                              ▼
+                    ┌─────────────────┐
+                    │     AWS S3      │
+                    │ • File Storage  │
+                    │ • Documents     │
+                    │ • Images        │
+                    └─────────────────┘
+```
 
-## Code of Conduct
+## 🚀 Quick Start
+
+### Prerequisites
+
+- PHP 8.2 or higher
+- Composer
+- Node.js 18+ and npm
+- MySQL 8.0+
+- AWS S3 account (for file storage)
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/sehabkhanzehad/hajjflow-backend.git
+   cd hajjflow-backend
+   ```
+
+2. **Install PHP dependencies**
+
+   ```bash
+   composer install
+   ```
+
+3. **Environment setup**
+
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. **Configure environment variables**
+
+   ```env
+   APP_NAME="HajjFlow"
+   APP_ENV=production
+   APP_URL=https://your-domain.com
+
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=hajjflow
+   DB_USERNAME=your_db_user
+   DB_PASSWORD=your_db_password
+
+   AWS_ACCESS_KEY_ID=your_aws_key
+   AWS_SECRET_ACCESS_KEY=your_aws_secret
+   AWS_DEFAULT_REGION=us-east-1
+   AWS_BUCKET=your_bucket_name
+   ```
+
+5. **Database setup**
+
+   ```bash
+   php artisan migrate
+   php artisan db:seed
+   ```
+
+6. **Storage setup**
+
+   ```bash
+   php artisan storage:link
+   ```
+
+7. **Start the application**
+
+   ```bash
+   php artisan serve
+   ```
+
+## 📊 Core Modules
+
+### 🏢 Agency Management
+
+- Multi-tenant architecture with complete data isolation
+- Agency profile management with branding
+- Team member management and permissions
+- License and compliance tracking
+
+### 👥 Pilgrim Lifecycle Management
+
+- Pre-registration and registration workflows
+- Document management (passports, visas, etc.)
+- Package assignment and itinerary management
+- Health and emergency contact tracking
+
+### 👨‍💼 Group Leader Operations
+
+- Group leader assignment and management
+- Performance tracking and analytics
+- Communication tools and reporting
+- Transfer and reassignment capabilities
+
+### 💰 Financial Operations
+
+- Transaction management and reconciliation
+- Bill generation and payment tracking
+- Profit/loss analysis by package/agency
+- Financial reporting and compliance
+
+### 📊 Business Intelligence
+
+- Real-time dashboard with KPIs
+- Performance analytics for agencies and packages
+- Revenue and expense tracking
+- Custom reporting capabilities
+
+## 🔧 API Documentation
+
+The API follows RESTful conventions and includes comprehensive documentation. Key endpoints:
+
+```
+POST   /api/auth/login          - User authentication
+GET    /api/analytics/dashboard - Dashboard analytics
+GET    /api/pilgrims            - Pilgrim management
+POST   /api/packages            - Package creation
+GET    /api/transactions        - Financial transactions
+PUT    /api/user/profile        - User profile updates
+```
+
+### Authentication
+
+Uses Laravel Sanctum for secure API authentication with token-based access.
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+php artisan test
+
+# Run with coverage
+php artisan test --coverage
+
+# Run specific test suite
+php artisan test --testsuite=Feature
+```
+
+## 🚀 Deployment
+
+### Production Checklist
+
+- [ ] Environment variables configured
+- [ ] Database migrations run
+- [ ] Storage permissions set
+- [ ] SSL certificate installed
+- [ ] Queue workers configured
+- [ ] Monitoring tools set up
+
+### Recommended Hosting
+
+- **Web Server**: Nginx or Apache
+- **Database**: AWS RDS MySQL
+- **File Storage**: AWS S3
+- **Cache**: Redis
+- **Queue**: AWS SQS or Redis
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📞 Support
+
+For support and questions:
+
+- **Email**: <support@hajjflow.com>
+- **Documentation**: [docs.hajjflow.com](https://docs.hajjflow.com)
+- **Issues**: [GitHub Issues](https://github.com/sehabkhanzehad/hajjflow-backend/issues)
+
+## 🙏 Acknowledgments
+
+- Laravel Framework for the robust backend foundation
+- React ecosystem for the modern frontend experience
+- AWS for reliable cloud infrastructure
+- The Laravel and React communities for continuous inspiration
+
+---
+
+**Built with ❤️ for the global Muslim community**
 
 In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
