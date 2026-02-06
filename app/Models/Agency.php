@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use function Illuminate\Support\years;
 
 class Agency extends Model
 {
@@ -42,6 +43,11 @@ class Agency extends Model
     public function groupLeaders(): HasMany
     {
         return $this->hasMany(GroupLeader::class);
+    }
+
+    public function years(): HasMany
+    {
+        return $this->hasMany(Year::class, 'agency_id', 'id');
     }
 
     // Helpers

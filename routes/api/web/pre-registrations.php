@@ -4,7 +4,7 @@ use App\Http\Controllers\Api\PreRegistrationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('pre-registrations')->group(function () {
-    Route::get('group-leaders', [PreRegistrationController::class, 'groupLeaders']);
+    Route::get('group-leaders', [PreRegistrationController::class, 'groupLeaders']); // ✅
     Route::get('pilgrims', [PreRegistrationController::class, 'pilgrims']);
     Route::get('passports', [PreRegistrationController::class, 'passports']);
 

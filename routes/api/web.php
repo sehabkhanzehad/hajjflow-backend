@@ -4,7 +4,6 @@ use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\PilgrimController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\YearController;
 use App\Http\Middleware\ResolveAgency;
 use Illuminate\Support\Facades\Route;
 
@@ -42,13 +41,12 @@ Route::middleware(['auth:customer-api', ResolveAgency::class])->group(function (
     Route::post('user/profile', [UserController::class, 'update']);
     Route::post('user/change-password', [UserController::class, 'changePassword']);
 
-    Route::prefix('years')->group(function () {
-        Route::get('/', [YearController::class, 'index']);
-        Route::post('/', [YearController::class, 'store']);
-        Route::put('/{year}', [YearController::class, 'update']);
-    });
 
-    Route::prefix('pilgrims')->group(function () {
-        Route::get('/{type}/{id}', [PilgrimController::class, 'show']);
-    });
+    require __DIR__ . '/web/customer/years.php';
+
+
+
+    // Route::prefix('pilgrims')->group(function () {
+    //     Route::get('/{type}/{id}', [PilgrimController::class, 'show']);
+    // });
 });
